@@ -34,7 +34,6 @@ func NewSocketConnection(connection *websocket.Conn) *SocketConnection {
 
 func (conn *SocketConnection) readLoop() {
     defer close(conn.readChannel)
-    defer logger.Println("read loop broken")
     for {
         select {
         case control := <-conn.controlChannel:
@@ -48,17 +47,14 @@ func (conn *SocketConnection) readLoop() {
             _, message, err := conn.connection.ReadMessage()
             if closeIfError(conn.connection, err) { return }
             conn.readChannel <-message
-            logger.Println("read loop")
         }
     }
 }
 
 func (conn *SocketConnection) writeLoop() {
-    defer logger.Println("write loop broken")
     for {
         select {
             case message, ok := <-conn.writeChannel:
-                logger.Println("writing")
                 if !ok {
                     conn.controlChannel <-controlClose
                     return
@@ -68,7 +64,6 @@ func (conn *SocketConnection) writeLoop() {
                 if logError(err) { return }
                 w.Write(message)
                 w.Close()
-                logger.Println("closing writer")
             case control, _ := <-conn.controlChannel:
                 switch control {
                 case controlClose:

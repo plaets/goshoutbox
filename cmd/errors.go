@@ -6,7 +6,7 @@ import (
     "os"
 )
 
-var logger = log.New(os.Stdout, "shoutbox: ", 0)
+var logger = log.New(os.Stdout, "shoutbox: ", log.Ldate | log.Ltime)
 
 func closeIfError(connection *websocket.Conn, err error) bool {
     if err != nil && websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
