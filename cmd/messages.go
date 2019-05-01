@@ -4,11 +4,56 @@ import (
     "encoding/json"
 )
 
-var usernameSet, _ = json.Marshal(map[string]string{"type":"success","message":"usernameSet"})
-var usernameInvalid, _ = json.Marshal(map[string]string{"type":"error","message":"usernameInvalid"})
-var usernameAlreadySet, _ = json.Marshal(map[string]string{"type":"error","message":"usernameAlreadySet"})
-var usernamTaken, _ = json.Marshal(map[string]string{"type":"error","message":"usernameTaken"})
+var usernameSet, _ = json.Marshal(map[string]string{"type":SuccessType,"message":"usernameSet"})
+var usernameInvalid, _ = json.Marshal(map[string]string{"type":ErrorType,"message":"usernameInvalid"})
+var usernameAlreadySet, _ = json.Marshal(map[string]string{"type":ErrorType,"message":"usernameAlreadySet"})
+var usernameTaken, _ = json.Marshal(map[string]string{"type":ErrorType,"message":"usernameTaken"})
+var usernameNotSet, _ = json.Marshal(map[string]string{"type":ErrorType,"message":"usernameNotSet"})
 
-var parseError, _ = json.Marshal(map[string]string{"type":"error","message":"parseError"})
-var unknownTypeError, _ = json.Marshal(map[string]string{"type":"error","message":"unknownTypeError"})
-var unknownError, _ = json.Marshal(map[string]string{"type":"error","message":"unknownError"})
+var messageTooLong, _ = json.Marshal(map[string]string{"type":ErrorType,"message":"messageTooLong"})
+
+var parseError, _ = json.Marshal(map[string]string{"type":ErrorType,"message":"parseError"})
+var unknownTypeError, _ = json.Marshal(map[string]string{"type":ErrorType,"message":"unknownTypeError"})
+var unknownError, _ = json.Marshal(map[string]string{"type":ErrorType,"message":"unknownError"})
+
+//server 
+const (
+    UsersListType = "usersList"
+    MessageType = "message"
+    ErrorType = "error"
+    SuccessType = "success"
+)
+
+type UsersList struct {
+    Type string `json:"type"`
+    Usernames []string `json:"usernames"`
+}
+
+type Message struct {
+    Type string `json:"type"`
+    Content string `json:"content"`
+    From string `json:"from"`
+    Timestamp int64 `json:"timestamp"`
+}
+
+//client - i really hate the fact that i have to move my files to another folder just to have namespaces (packages)
+
+const (
+    GetUsersListType = "getUsersList"
+    SendMessageType = "sendMessage"
+    SetUsernameType = "setUsername"
+)
+
+type GetUsersList struct {
+    Type string `json:"type"`
+}
+
+type SendMessage struct {
+    Type string `json:"type"`
+    Content string `json:"content"`
+}
+
+type SetUsername struct {
+    Type string `json:"type"`
+    Username string `json:"username"`
+}
