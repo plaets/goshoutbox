@@ -1,0 +1,51 @@
+package main
+
+import (
+    "github.com/gorilla/websocket"
+    "log"
+    "os"
+)
+
+var logger = log.New(os.Stdout, "shoutbox: ", 0)
+
+func closeIfError(connection *websocket.Conn, err error) bool {
+    if err != nil && websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
+        logger.Println(err)
+        return true
+    }
+    return false
+}
+
+func logError(err error) bool {
+    if err != nil {
+        logger.Println(err)
+        return true
+    }
+    return false
+}
+
+func closeIfNotOk(conn *SocketConnection, ok bool) bool {
+    if !ok {
+        conn.controlChannel <-controlClose
+    }
+    return !ok
+}
+
+func sendError(err error, errbody []byte, conn *SocketConnection) bool {
+    if err != nil {
+        conn.writeChannel <-errbody
+        return true
+    }
+    return false
+}
+
+func sendErrorAndDisconnect(err error, errbody []byte, conn *SocketConnection) bool {
+    if err != nil {
+        logger.Println("disconnecting")
+        logError(err)
+        conn.writeChannel <-errbody
+        conn.controlChannel <-controlClose
+        return true
+    }
+    return false
+}
