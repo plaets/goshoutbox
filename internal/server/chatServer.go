@@ -1,4 +1,4 @@
-package main
+package server
 
 import (
     "net/http"
@@ -14,6 +14,8 @@ type ChatServer struct {
 }
 
 func NewChatServer() *ChatServer {
+    logger.Println("starting the chat server")
+
     mux := http.NewServeMux()
     chatServer := &ChatServer{make([]*ChatUser, 0), mux}
 

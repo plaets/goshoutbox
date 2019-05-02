@@ -1,8 +1,10 @@
-package main
+package server
 
 import (
     "encoding/json"
 )
+
+//server 
 
 var usernameSet, _ = json.Marshal(map[string]string{"type":SuccessType,"message":"usernameSet"})
 var usernameInvalid, _ = json.Marshal(map[string]string{"type":ErrorType,"message":"usernameInvalid"})
@@ -16,7 +18,6 @@ var parseError, _ = json.Marshal(map[string]string{"type":ErrorType,"message":"p
 var unknownTypeError, _ = json.Marshal(map[string]string{"type":ErrorType,"message":"unknownTypeError"})
 var unknownError, _ = json.Marshal(map[string]string{"type":ErrorType,"message":"unknownError"})
 
-//server 
 const (
     UsersListType = "usersList"
     MessageType = "message"

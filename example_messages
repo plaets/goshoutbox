@@ -1,0 +1,3 @@
+{"type":"setUsername","username":"asdasd"}
+{"type":"getUsersList"}
+{"type":"message","content":"test"}
