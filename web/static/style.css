@@ -1,0 +1,66 @@
+.shoutbox {
+    height: 95vh;
+    width: 95vw;
+    grid-template-columns: minmax(8rem, auto) 9fr;
+    grid-template-rows: minmax(90%, auto) 50px;
+    display: grid;
+    grid-gap: 5px;
+}
+
+.shoutbox .userList {
+    font-size: 1em;
+    border: 1px solid black;
+    height: 100%;
+    width: 100%;
+    grid-column: 1;
+    grid-row: 1 / span 2;
+    overflow: auto;
+}
+
+.shoutbox .userList * {
+    margin: 2px;
+}
+
+.shoutbox .messageControls {
+    border: 1px solid black;
+    height: 100%;
+    width: 100%;
+    grid-column: 2;
+    grid-row: 2;
+}
+
+.shoutbox .messageControls * {
+    height: 95%;
+}
+
+.shoutbox .messageList {
+    border: 1px solid black;
+    height: 100%;
+    width: 100%;
+    grid-column: 2;
+    grid-row: 1;
+    overflow: auto;
+}
+
+.shoutbox .messageList .message {
+    margin: 3px;
+    border-bottom: 1px solid lightgray;
+}
+
+.shoutbox .messageList .message .timestamp {
+    font-size: 0.75em;
+    text-color: gray;
+    margin-left: 2px;
+    margin-right: 2px;
+}
+
+.shoutbox .messageList .message .username {
+    margin-left: 2px;
+    margin-right: 2px;
+    text-decoration: underline;
+}
+
+.shoutbox .messageList .message .content {
+    word-wrap: break-word;
+    margin-left: 3px;
+}

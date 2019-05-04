@@ -3,7 +3,6 @@
 class ChatConnection {
     constructor(path) {
         this.websocket = new WebSocket(path);
-        this.websocket.binaryType = "text";
         this.websocket.onmessage = (data) => this.messageListener(data);
 
         this.handlers = {};

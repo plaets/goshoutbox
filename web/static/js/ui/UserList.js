@@ -5,7 +5,7 @@ class UserEntry {
         this.DOM = document.createElement("div");
         this.DOM.classList.add("userEntry");
         this.username = username;
-        this.DOM.innerText = this.username;
+        this.DOM.innerText = htmlEncode(this.username);
     }
 }
 
@@ -17,14 +17,18 @@ class UserList {
     }
 
     addUser(username) {
-        let user = new UserEntry(username);
-        this.users.append(user);
-        this.DOM.append(user);
+        if(this.users.find((e) => e.username == username) == undefined) { //performance? lol
+            let user = new UserEntry(username);
+            this.users.push(user);
+            this.DOM.append(user.DOM);
+        }
     }
     
     removeUser(username) {
         let i = this.users.findIndex((u) => u.username == username);
-        this.DOM.removeChild(this.users[i].DOM);
-        this.users.splice(i, 1);
+        if(i != -1) {
+            this.DOM.removeChild(this.users[i].DOM);
+            this.users.splice(i, 1);
+        }
     }
 }

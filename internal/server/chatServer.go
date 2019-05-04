@@ -45,7 +45,7 @@ func (server *ChatServer) loop(user *ChatUser) {
     //send a banner
     defer func() {
         server.userDisconnected(user)
-        logger.Println(fmt.Sprintf("loop for user %s stopped", user.username))
+        //logger.Println(fmt.Sprintf("loop for user %s stopped", user.username))
     }()
 
     for {
@@ -81,9 +81,9 @@ func (server *ChatServer) handleMessage(user *ChatUser, data map[string]interfac
         } else {
             user.connection.writeChannel <- usernameNotSet
         }
-    case GetUsersListType:
-        msg, err := json.Marshal(UsersList{
-            UsersListType,
+    case GetUserListType:
+        msg, err := json.Marshal(UserList{
+            UserListType,
             *server.getUsersList(),
         })
 
@@ -113,7 +113,7 @@ func (server *ChatServer) setUsername(user* ChatUser, username string) {
                 user.username = username
                 user.connection.writeChannel <- usernameSet
                 server.broadcastMessage(UserConnected{UserConnectedType, user.username})
-                logger.Println("setting username " + username)
+                logger.Println("new user connected: " + username)
             }
         } else {
             user.connection.writeChannel <- usernameInvalid

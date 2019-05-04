@@ -13,14 +13,24 @@ class MessageControls {
         this.sendButton.classList.add("sendButton");
         this.sendButton.innerText = "send";
 
+        document.addEventListener("keypress", (e) => {
+            if(e.keyCode == 13 && this.input == document.activeElement) {
+                this.send();
+            }
+        });
+
+        this.sendButton.onclick = () => this.send();
+
         this.DOM.append(this.input, this.sendButton);
     }
 
     setSendListener(fun) {
-        this.sendButton.onclick = () => {
-            fun(this.input.value);
-            this.resetMessageInput();
-        }
+        this.sendListener = fun;
+    }
+
+    send() {
+        this.sendListener(this.input.value);
+        this.resetMessageInput();
     }
 
     resetMessageInput() {

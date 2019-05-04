@@ -19,7 +19,7 @@ var unknownTypeError, _ = json.Marshal(map[string]string{"type":ErrorType,"messa
 var unknownError, _ = json.Marshal(map[string]string{"type":ErrorType,"message":"unknownError"})
 
 const (
-    UsersListType = "usersList"
+    UserListType = "userList"
     MessageType = "message"
     UserDisconnectedType = "userDisconnected"
     UserConnectedType = "userConnected"
@@ -27,7 +27,7 @@ const (
     SuccessType = "success"
 )
 
-type UsersList struct {
+type UserList struct {
     Type string `json:"type"`
     Usernames []string `json:"usernames"`
 }
@@ -52,12 +52,12 @@ type UserConnected struct {
 //client - i really hate the fact that i have to move my files to another folder just to have namespaces (packages)
 
 const (
-    GetUsersListType = "getUsersList"
+    GetUserListType = "getUserList"
     SendMessageType = "sendMessage"
     SetUsernameType = "setUsername"
 )
 
-type GetUsersList struct {
+type GetUserList struct {
     Type string `json:"type"`
 }
 

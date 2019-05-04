@@ -49,12 +49,12 @@ func (conn *SocketConnection) readLoop() {
 
     defer func() {
         close(conn.readChannel)
-        logger.Println("read loop stopped")
+        //logger.Println("read loop stopped")
     }()
 
     for {
         _, message, err := conn.connection.ReadMessage()
-        logger.Println("got a message")
+        //logger.Println("got a message")
         if err != nil {
             conn.controlChannel <-controlClose
             return
@@ -70,7 +70,7 @@ func (conn *SocketConnection) writeLoop() {
     defer func() {
         timer.Stop()
         conn.closeConnection()
-        logger.Println("write loop stopped")
+        //logger.Println("write loop stopped")
     }()
 
     for {
