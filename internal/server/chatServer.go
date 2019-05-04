@@ -2,46 +2,57 @@ package server
 
 import (
     "net/http"
-    "fmt"
     "github.com/gorilla/websocket"
     "encoding/json"
     "time"
+    "fmt"
+    "sync"
 )
 
 type ChatServer struct {
     users []*ChatUser
+    usersMutex sync.Mutex
     mux *http.ServeMux
 }
 
 func NewChatServer() *ChatServer {
     logger.Println("starting the chat server")
 
+    fsServer := http.FileServer(http.Dir("web/static"))
     mux := http.NewServeMux()
-    chatServer := &ChatServer{make([]*ChatUser, 0), mux}
+    server := &ChatServer{make([]*ChatUser, 0), sync.Mutex{}, mux}
 
-    mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-        fmt.Fprint(w, "Hello from the shoutbox!")
-    })
-
+    mux.Handle("/", fsServer)
     mux.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
         conn, err := websocket.Upgrade(w, r, nil, 1024, 1024)
-        logError(err)
+        if logError(err) { return }
 
         user := NewChatUser(NewSocketConnection(conn))
-        chatServer.users = append(chatServer.users, user)
-        go chatServer.loop(user)
+
+        server.usersMutex.Lock()
+        server.users = append(server.users, user)
+        server.usersMutex.Unlock()
+
+        go server.loop(user)
     })
 
     http.ListenAndServe(":9000", mux)
 
-    return chatServer
+    return server
 }
 
 func (server *ChatServer) loop(user *ChatUser) {
     //send a banner
+    defer func() {
+        server.userDisconnected(user)
+        logger.Println(fmt.Sprintf("loop for user %s stopped", user.username))
+    }()
+
     for {
         message, ok := <-user.connection.readChannel
-        if !ok { return }
+        if !ok {
+            return
+        }
 
         var data map[string]interface{}
 
@@ -63,14 +74,14 @@ func (server *ChatServer) loop(user *ChatUser) {
 
 func (server *ChatServer) handleMessage(user *ChatUser, data map[string]interface{}) {
     switch data["type"].(string) {
-    case "message":
+    case SendMessageType:
         if(user.username != "") {
             message := data["content"].(string)
             server.sendMessage(user, message)
         } else {
             user.connection.writeChannel <- usernameNotSet
         }
-    case "getUsersList":
+    case GetUsersListType:
         msg, err := json.Marshal(UsersList{
             UsersListType,
             *server.getUsersList(),
@@ -82,18 +93,18 @@ func (server *ChatServer) handleMessage(user *ChatUser, data map[string]interfac
             logger.Println(err)
             user.connection.writeChannel <-unknownError
         }
-    case "setUsername":
+    case SetUsernameType:
         if data["username"] == nil {
-            logger.Println("username is nil")
             user.connection.writeChannel <-usernameInvalid
         } else {
             server.setUsername(user, data["username"].(string))
         }
+    default:
+        user.connection.writeChannel <-unknownTypeError
     }
 }
 
 func (server *ChatServer) setUsername(user* ChatUser, username string) {
-    logger.Println("setting username " + username)
     if user.username == "" {
         if len(username) >= 3 && len(username) <= 32 {
             if server.isUsernameTaken(username) {
@@ -101,6 +112,8 @@ func (server *ChatServer) setUsername(user* ChatUser, username string) {
             } else {
                 user.username = username
                 user.connection.writeChannel <- usernameSet
+                server.broadcastMessage(UserConnected{UserConnectedType, user.username})
+                logger.Println("setting username " + username)
             }
         } else {
             user.connection.writeChannel <- usernameInvalid
@@ -111,6 +124,8 @@ func (server *ChatServer) setUsername(user* ChatUser, username string) {
 }
 
 func (server *ChatServer) isUsernameTaken(username string) bool {
+    server.usersMutex.Lock()
+    defer server.usersMutex.Unlock()
     for _, v := range server.users {
         if v.username == username {
             return true
@@ -134,13 +149,40 @@ func (server *ChatServer) sendMessage(user *ChatUser, message string) {
         return
     }
 
-    msg, err := json.Marshal(Message{MessageType, message, user.username, time.Now().Unix()})
+    server.broadcastMessage(Message{MessageType, message, user.username, time.Now().Unix()})
+}
+
+func (server *ChatServer) broadcastMessage(val interface{}) {
+    msg, err := json.Marshal(val)
     if err == nil {
-        for _, v := range server.users {
-            v.connection.writeChannel <- msg
-        }
+        server.broadcastBytes(msg)
     } else {
-        user.connection.writeChannel <- unknownError
+        logger.Println(err)
+    }
+}
+
+func (server *ChatServer) broadcastBytes(msg []byte) {
+    server.usersMutex.Lock()
+    for _, v := range server.users {
+        v.connection.writeChannel <-msg
+    }
+    server.usersMutex.Unlock()
+}
+
+func (server *ChatServer) userDisconnected(user *ChatUser) {
+    username := user.username
+    server.usersMutex.Lock()
+    for i, v := range server.users {
+        if v == user {
+            server.users[i] = nil
+            server.users = append(server.users[:i], server.users[i+1:]...)
+        }
+    }
+    server.usersMutex.Unlock()
+    if user.username != "" {
+        logger.Println(fmt.Sprintf("user %s disconnected", user.username))
+        logger.Println(fmt.Sprintf("users left: %d", len(server.users)))
+        server.broadcastMessage(UserDisconnected{UserDisconnectedType, username})
     }
 }
 

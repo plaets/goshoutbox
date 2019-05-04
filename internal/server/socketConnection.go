@@ -2,11 +2,18 @@ package server
 
 import (
     "github.com/gorilla/websocket"
-    //"time"
+    "time"
 )
 
 const (
     controlClose = 0
+)
+
+const (
+    pongTimeout = 16 * time.Second
+    writeTimeout = 10 * time.Second
+    pingPeriod = 5 * time.Second
+    maxMessageSize = 1024 * 10
 )
 
 type SocketConnection struct {
@@ -33,28 +40,43 @@ func NewSocketConnection(connection *websocket.Conn) *SocketConnection {
 }
 
 func (conn *SocketConnection) readLoop() {
-    defer close(conn.readChannel)
+    conn.connection.SetReadLimit(maxMessageSize)
+    conn.connection.SetReadDeadline(time.Now().Add(pongTimeout))
+    conn.connection.SetPongHandler(func(string) error {
+        conn.connection.SetReadDeadline(time.Now().Add(pongTimeout))
+        return nil
+    })
+
+    defer func() {
+        close(conn.readChannel)
+        logger.Println("read loop stopped")
+    }()
+
     for {
-        select {
-        case control := <-conn.controlChannel:
-            switch control {
-            case controlClose:
-                return
-            default:
-                logger.Println("unknown control command")
-            }
-        default:
-            _, message, err := conn.connection.ReadMessage()
-            if closeIfError(conn.connection, err) { return }
-            conn.readChannel <-message
+        _, message, err := conn.connection.ReadMessage()
+        logger.Println("got a message")
+        if err != nil {
+            conn.controlChannel <-controlClose
+            return
         }
+        conn.readChannel <-message
     }
 }
 
+//heacily inspired by https://github.com/gorilla/websocket/blob/master/examples/chat/client.go
 func (conn *SocketConnection) writeLoop() {
+    timer := time.NewTicker(pingPeriod)
+
+    defer func() {
+        timer.Stop()
+        conn.closeConnection()
+        logger.Println("write loop stopped")
+    }()
+
     for {
         select {
             case message, ok := <-conn.writeChannel:
+                conn.connection.SetWriteDeadline(time.Now().Add(writeTimeout))
                 if !ok {
                     conn.controlChannel <-controlClose
                     return
@@ -67,15 +89,25 @@ func (conn *SocketConnection) writeLoop() {
             case control, _ := <-conn.controlChannel:
                 switch control {
                 case controlClose:
-                    conn.connection.WriteMessage(websocket.CloseMessage,
-                        websocket.FormatCloseMessage(websocket.CloseAbnormalClosure, ""))
-                    conn.connection.Close()
-                    close(conn.writeChannel)
-                    close(conn.controlChannel)
                     return
                 default:
                     logger.Println("unknown control command")
                 }
+            case <-timer.C:
+                conn.connection.SetWriteDeadline(time.Now().Add(writeTimeout))
+                if err := conn.connection.WriteMessage(websocket.PingMessage, nil); err != nil {
+                    return
+                }
         }
     }
+}
+
+func (conn *SocketConnection) closeConnection() {
+    close(conn.writeChannel)
+    close(conn.controlChannel)
+    conn.connection.WriteMessage(websocket.CloseMessage,
+        websocket.FormatCloseMessage(websocket.CloseAbnormalClosure, ""))
+    conn.connection.Close()
+    //conn.controlChannel <-controlClose
+    //will block forever causing a goroutine leak
 }

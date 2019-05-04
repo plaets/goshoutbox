@@ -21,6 +21,8 @@ var unknownError, _ = json.Marshal(map[string]string{"type":ErrorType,"message":
 const (
     UsersListType = "usersList"
     MessageType = "message"
+    UserDisconnectedType = "userDisconnected"
+    UserConnectedType = "userConnected"
     ErrorType = "error"
     SuccessType = "success"
 )
@@ -35,6 +37,16 @@ type Message struct {
     Content string `json:"content"`
     From string `json:"from"`
     Timestamp int64 `json:"timestamp"`
+}
+
+type UserDisconnected struct {
+    Type string `json:"type"`
+    Username string `json:"username"`
+}
+
+type UserConnected struct {
+    Type string `json:"type"`
+    Username string `json:"username"`
 }
 
 //client - i really hate the fact that i have to move my files to another folder just to have namespaces (packages)
