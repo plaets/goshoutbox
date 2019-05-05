@@ -7,6 +7,12 @@ class ChatConnection {
 
         this.handlers = {};
     }
+    
+    openPromise() {
+        return new Promise((resolve) => {
+            this.websocket.addEventListener("open", () => resolve());
+        });
+    }
 
     messageListener(data) {
         this.handleMessage(JSON.parse(data.data));

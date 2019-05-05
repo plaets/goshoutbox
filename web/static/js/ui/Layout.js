@@ -8,7 +8,8 @@ class Layout {
         this.messageList = new MessageList();
         this.messageControls = new MessageControls();
         this.userList = new UserList();
+        this.statusBar = new StatusBar();
 
-        this.DOM.append(this.userList.DOM, this.messageList.DOM, this.messageControls.DOM);
+        this.DOM.append(this.userList.DOM, this.messageList.DOM, this.messageControls.DOM, this.statusBar.DOM);
     }
 }

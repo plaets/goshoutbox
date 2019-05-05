@@ -1,19 +1,33 @@
-.shoutbox {
-    height: 95vh;
-    width: 95vw;
-    grid-template-columns: minmax(8rem, auto) 9fr;
-    grid-template-rows: minmax(90%, auto) 50px;
-    display: grid;
-    grid-gap: 5px;
+* {
+    box-sizing: border-box;
 }
 
+body {
+    width: 100vw;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+}
+
+.shoutbox {
+    height: 100%;
+    width: 100%;
+    min-width: 400px; /* sad */
+    grid-template-columns: minmax(8rem, auto) 9fr;
+    grid-template-rows: 9fr 1fr;
+    display: grid;
+    grid-gap: 5px;
+    position: relative;
+}
+
+/* userList */
 .shoutbox .userList {
     font-size: 1em;
     border: 1px solid black;
     height: 100%;
     width: 100%;
     grid-column: 1;
-    grid-row: 1 / span 2;
+    grid-row: 1;
     overflow: auto;
 }
 
@@ -21,18 +35,59 @@
     margin: 2px;
 }
 
+/* statusBar */
+.shoutbox .statusBarWrapper {
+    border: 1px solid black;
+    height: 100%;
+    width: 100%;
+    grid-column: 1;
+    grid-row: 2;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.shoutbox .statusBar {
+    font-size: 1em;
+    word-wrap: break-word;
+    padding: 5px;
+    text-align: center;
+}
+
+.shoutbox .error {
+    color: red;
+}
+
+/* messageControls */
 .shoutbox .messageControls {
     border: 1px solid black;
     height: 100%;
     width: 100%;
     grid-column: 2;
     grid-row: 2;
+
+    display: flex;
+    justify-content: space-between;
 }
 
-.shoutbox .messageControls * {
-    height: 95%;
+.shoutbox .messageControls .messageInput {
+    border: none;
+    border-bottom: 1px solid black;
+    width: 100%;
+    margin: 10px;
+    padding-left: 5px;
+    background-color: WhiteSmoke;
 }
 
+.shoutbox .messageControls .sendButton {
+    border: none;
+    border-bottom: 1px solid black;
+    margin: 10px;
+    background-color: WhiteSmoke;
+}
+
+/* messageList */
 .shoutbox .messageList {
     border: 1px solid black;
     height: 100%;
@@ -63,4 +118,76 @@
 .shoutbox .messageList .message .content {
     word-wrap: break-word;
     margin-left: 3px;
+}
+
+/* prompt */
+.promptWrapper {
+    width: 100%;
+    height: 100%;
+    z-index: 2000;
+    position: absolute;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.prompt {
+    width: 20rem;
+    height: 10rem;
+    background-color: white;
+    border: 1px solid black;
+
+    grid-template-columns: repeat(3, 3fr);
+    grid-template-rows: 6fr minmax(50px, 2fr) minmax(50px, 2fr);
+    display: grid;
+
+    grid-gap: 5px;
+}
+
+.prompt * {
+    margin: 3px;
+}
+
+.prompt .labelWrapper {
+    grid-column: 1 / span 3;
+    grid-rows: 1 / span 1;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.prompt .labelWrapper * {
+    text-align: center;
+}
+
+.prompt .input {
+    grid-column: 1 / span 3;
+    grid-rows: 2 / span 1;
+    padding-left: 5px;
+}
+
+.prompt .confirmButton {
+    grid-column: 3 / span 1;
+    grid-rows: 3 / 3;
+}
+
+.prompt .cancelButton {
+    grid-column: 2 / span 1;
+    grid-rows: 3 / 3;
+}
+
+.prompt button {
+    border: none;
+    border-bottom: 1px solid black;
+    margin: 10px;
+    background-color: WhiteSmoke;
+}
+
+.prompt input {
+    border: none;
+    border-bottom: 1px solid black;
+    margin: 10px;
+    background-color: WhiteSmoke;
 }

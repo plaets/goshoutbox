@@ -1,8 +1,7 @@
 "use strict";
 
 class UserEntry {
-    constructor(username) {
-        this.DOM = document.createElement("div");
+    constructor(username) { this.DOM = document.createElement("div");
         this.DOM.classList.add("userEntry");
         this.username = username;
         this.DOM.innerText = htmlEncode(this.username);
@@ -17,7 +16,7 @@ class UserList {
     }
 
     addUser(username) {
-        if(this.users.find((e) => e.username == username) == undefined) { //performance? lol
+        if(username != "" && this.users.find((e) => e.username == username) == undefined) { //performance? lol
             let user = new UserEntry(username);
             this.users.push(user);
             this.DOM.append(user.DOM);
@@ -30,5 +29,10 @@ class UserList {
             this.DOM.removeChild(this.users[i].DOM);
             this.users.splice(i, 1);
         }
+    }
+
+    usersNum() {
+        console.log(this.users);
+        return this.users.length;
     }
 }

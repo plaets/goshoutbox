@@ -1,65 +1,87 @@
 "use strict";
 
 document.addEventListener("DOMContentLoaded", () => {
-    let connection = new ChatConnection("ws://" + location.host + location.pathname + "ws");
+    let connection = new ChatConnection("wss://" + location.host + location.pathname + "ws");
     connection.setHandler("default", console.log);
-
-    let username = prompt("username");
-    connection.send({type:"setUsername",username:username});
 
     let ui = new Layout();
     document.body.append(ui.DOM);
 
-    ui.messageControls.setSendListener((text) => {
-        connection.send({type:"sendMessage",content:text});
-    });
+    connection.openPromise().then(() => {
+        let usernamePrompt = new Prompt("enter your username", "username");
+        ui.DOM.append(usernamePrompt.DOM);
 
-    connection.setHandler("message", (data) => {
-        console.log(data);
-        ui.messageList.addMessage(new Message(data.from, data.content, data.timestamp));
-    });
-
-    connection.setHandler("userConnected", (data) => {
-        ui.userList.addUser(data.username);
-    });
-
-    connection.setHandler("userDisconnected", (data) => {
-        ui.userList.removeUser(data.username);
-    });
-
-    connection.setHandler("userList", (data) => {
-        data.usernames.forEach((u) => ui.userList.addUser(u));
-    });
-
-    let errorHandlers = {
-        "usernameTaken": () => { 
-            let username = prompt("user with choosen username already exists, please choose another username");
+        usernamePrompt.getPromise().then((username) => {
             connection.send({type:"setUsername",username:username});
-        },
-        "usernameInvalid": () => { 
-            let username = prompt("choosen username is invalid, please choose another username");
-            if(username != undefined) {
-                connection.send({type:"setUsername",username:username});
+        }, () => {});
+
+        ui.messageControls.setSendListener((text) => {
+            connection.send({type:"sendMessage",content:text});
+        });
+
+        connection.setHandler("message", (data) => {
+            console.log(data);
+            ui.messageList.addMessage(new Message(data.from, data.content, data.timestamp));
+        });
+
+        connection.setHandler("userConnected", (data) => {
+            ui.userList.addUser(data.username);
+            ui.statusBar.setMessage("users: " + ui.userList.usersNum());
+        });
+
+        connection.setHandler("userDisconnected", (data) => {
+            ui.userList.removeUser(data.username);
+            ui.statusBar.setMessage("users: " + ui.userList.usersNum());
+        });
+
+        connection.setHandler("userList", (data) => {
+            data.usernames.forEach((u) => ui.userList.addUser(u));
+            ui.statusBar.setMessage("users: " + ui.userList.usersNum());
+        });
+
+        let errorHandlers = {
+            "usernameTaken": () => { 
+                let usernamePrompt = new Prompt("user with choosen username already exists, please choose another username", 
+                    "username");
+                ui.DOM.append(usernamePrompt.DOM);
+                usernamePrompt.getPromise().then((username) => {
+                    connection.send({type:"setUsername",username:username});
+                }, () => {});
+            },
+            "usernameInvalid": () => { 
+                let usernamePrompt = new Prompt("choosen username is invalid, please choose another username", "username");
+                ui.DOM.append(usernamePrompt.DOM);
+                usernamePrompt.getPromise().then((username) => {
+                    connection.send({type:"setUsername",username:username});
+                }, () => {});
+            },
+            "messageInvalid": () => { 
+                ui.statusBar.setError("message invalid");
+            },
+            "usernameNotSet": () => {
+                let usernamePrompt = new Prompt("no username is set, please set a username", "username");
+                ui.DOM.append(usernamePrompt.DOM);
+                usernamePrompt.getPromise().then((username) => {
+                    connection.send({type:"setUsername",username:username});
+                }, () => {});
+            },
+            "default": (data) => { 
+                console.log("unknown error", data);
+                ui.statusBar.setError("unknown error");
+            },
+        };
+
+        connection.setHandler("error", (data) => {
+            let handler = errorHandlers[data.message];
+            if(handler != undefined) {
+                handler(data);
+            } else {
+                errorHandlers["default"](data);
             }
-        },
-        "messageTooLong": () => { 
-            alert("message is too long");
-        },
-        "default": (data) => { 
-            alert("unknown error: " + data.message);
-        },
-    };
+        });
 
-    connection.setHandler("error", (data) => {
-        let handler = errorHandlers[data.message];
-        if(handler != undefined) {
-            handler(data);
-        } else {
-            errorHandlers["default"](data);
-        }
+        connection.send({type:"getUserList"});
     });
-
-    connection.send({type:"getUserList"});
 });
 
 //not sure what will happen if somebody disconnects while we iterate thru getUserList

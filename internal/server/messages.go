@@ -12,7 +12,7 @@ var usernameAlreadySet, _ = json.Marshal(map[string]string{"type":ErrorType,"mes
 var usernameTaken, _ = json.Marshal(map[string]string{"type":ErrorType,"message":"usernameTaken"})
 var usernameNotSet, _ = json.Marshal(map[string]string{"type":ErrorType,"message":"usernameNotSet"})
 
-var messageTooLong, _ = json.Marshal(map[string]string{"type":ErrorType,"message":"messageTooLong"})
+var messageInvalid, _ = json.Marshal(map[string]string{"type":ErrorType,"message":"messageInvalid"})
 
 var parseError, _ = json.Marshal(map[string]string{"type":ErrorType,"message":"parseError"})
 var unknownTypeError, _ = json.Marshal(map[string]string{"type":ErrorType,"message":"unknownTypeError"})
