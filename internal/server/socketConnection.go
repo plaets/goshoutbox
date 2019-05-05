@@ -54,7 +54,7 @@ func (conn *SocketConnection) readLoop() {
 
     for {
         _, message, err := conn.connection.ReadMessage()
-        //logger.Println("got a message")
+        logger.Println("got a message")
         if err != nil {
             conn.controlChannel <-controlClose
             return
@@ -76,6 +76,7 @@ func (conn *SocketConnection) writeLoop() {
     for {
         select {
             case message, ok := <-conn.writeChannel:
+                logger.Println("writing")
                 conn.connection.SetWriteDeadline(time.Now().Add(writeTimeout))
                 if !ok {
                     conn.controlChannel <-controlClose

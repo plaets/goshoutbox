@@ -36,7 +36,8 @@ func NewChatServer() *ChatServer {
         go server.loop(user)
     })
 
-    http.ListenAndServe(":9000", mux)
+    //http.ListenAndServe(":9000", mux)
+    http.ListenAndServeTLS(":9001", "server.crt", "server.key", mux)
 
     return server
 }
@@ -106,7 +107,7 @@ func (server *ChatServer) handleMessage(user *ChatUser, data map[string]interfac
 
 func (server *ChatServer) setUsername(user* ChatUser, username string) {
     if user.username == "" {
-        if len(username) >= 3 && len(username) <= 32 {
+        if validateUsername(username) {
             if server.isUsernameTaken(username) {
                 user.connection.writeChannel <- usernameTaken
             } else {
@@ -127,7 +128,7 @@ func (server *ChatServer) isUsernameTaken(username string) bool {
     server.usersMutex.Lock()
     defer server.usersMutex.Unlock()
     for _, v := range server.users {
-        if v.username == username {
+       if v.username == username {
             return true
         }
     }
@@ -136,6 +137,10 @@ func (server *ChatServer) isUsernameTaken(username string) bool {
 
 func (server *ChatServer) getUsersList() *[]string {
     users := make([]string, 0)
+
+    server.usersMutex.Lock()
+    defer server.usersMutex.Unlock()
+
     for _, v := range server.users {
         users = append(users, v.username)
     }
@@ -144,8 +149,8 @@ func (server *ChatServer) getUsersList() *[]string {
 }
 
 func (server *ChatServer) sendMessage(user *ChatUser, message string) {
-    if len(message) > 10400 {
-        user.connection.writeChannel <- messageTooLong
+    if !validateMessage(message) {
+        user.connection.writeChannel <-messageInvalid
         return
     }
 
@@ -189,4 +194,5 @@ func (server *ChatServer) userDisconnected(user *ChatUser) {
 //message will be sent back to the user that sent it. 
 //i think (hope) that this will make the message timeline more consistent across users,
 //especially if there are many messages sent at once or the latency is big.
-//this however means that more data will be sent and wasted. not a lot but still
+//this however means that more data will be sent and wasted. not a lot but still.
+//also, the number of users this server can handle is probably is too small to think about things like this anyway
