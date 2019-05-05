@@ -1,7 +1,7 @@
 "use strict";
 
 class Prompt {
-    constructor(label, placeholder="") {
+    constructor(label, placeholder="", activate=false) {
         this.DOM = document.createElement("div");
         this.DOM.classList.add("promptWrapper");
 
@@ -33,6 +33,10 @@ class Prompt {
         this.DOM.append(this.prompt);
 
         this.setupButtons();
+
+        if(activate) {
+            this.prompt.focus();
+        }
     }
 
     setupButtons() {

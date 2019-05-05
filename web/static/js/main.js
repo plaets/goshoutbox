@@ -42,14 +42,15 @@ document.addEventListener("DOMContentLoaded", () => {
         let errorHandlers = {
             "usernameTaken": () => { 
                 let usernamePrompt = new Prompt("user with choosen username already exists, please choose another username", 
-                    "username");
+                    "username", true);
                 ui.DOM.append(usernamePrompt.DOM);
                 usernamePrompt.getPromise().then((username) => {
                     connection.send({type:"setUsername",username:username});
                 }, () => {});
             },
             "usernameInvalid": () => { 
-                let usernamePrompt = new Prompt("choosen username is invalid, please choose another username", "username");
+                let usernamePrompt = new Prompt("choosen username is invalid, please choose another username", 
+                    "username", true);
                 ui.DOM.append(usernamePrompt.DOM);
                 usernamePrompt.getPromise().then((username) => {
                     connection.send({type:"setUsername",username:username});
@@ -59,7 +60,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 ui.statusBar.setError("message invalid");
             },
             "usernameNotSet": () => {
-                let usernamePrompt = new Prompt("no username is set, please set a username", "username");
+                let usernamePrompt = new Prompt("no username is set, please set a username", 
+                    "username", true);
                 ui.DOM.append(usernamePrompt.DOM);
                 usernamePrompt.getPromise().then((username) => {
                     connection.send({type:"setUsername",username:username});
