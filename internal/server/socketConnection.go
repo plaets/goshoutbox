@@ -56,6 +56,7 @@ func (conn *SocketConnection) readLoop() {
         _, message, err := conn.connection.ReadMessage()
         logger.Println("got a message")
         if err != nil {
+            logger.Println(err)
             conn.controlChannel <-controlClose
             return
         }
@@ -97,6 +98,7 @@ func (conn *SocketConnection) writeLoop() {
             case <-timer.C:
                 conn.connection.SetWriteDeadline(time.Now().Add(writeTimeout))
                 if err := conn.connection.WriteMessage(websocket.PingMessage, nil); err != nil {
+                        logger.Println(err)
                     return
                 }
         }

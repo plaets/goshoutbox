@@ -58,6 +58,7 @@ func (server *ChatServer) loop(user *ChatUser) {
         var data map[string]interface{}
 
         if err := json.Unmarshal([]byte(message), &data); err != nil {
+            logger.Println(err)
             user.connection.writeChannel <-parseError
             user.connection.controlChannel <-controlClose
             return
@@ -89,6 +90,7 @@ func (server *ChatServer) handleMessage(user *ChatUser, data map[string]interfac
         })
 
         if err == nil {
+            logger.Println(err)
             user.connection.writeChannel <-msg
         } else {
             logger.Println(err)

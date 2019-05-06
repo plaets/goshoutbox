@@ -1,19 +1,13 @@
-* {
+.shoutbox * {
     box-sizing: border-box;
 }
 
-body {
-    width: 100vw;
-    height: 100vh;
-    overflow: hidden;
-}
-
 .shoutbox {
-    height: calc(100% - 15px);
-    width: calc(100% - 15px);
+    height: 100%;
+    width: 100%;
     min-width: 350px;
     grid-template-columns: minmax(8rem, auto) 9fr;
-    grid-template-rows: 12fr 60px;
+    grid-template-rows: calc(100% - 60px - 5px) 60px;
     display: grid;
     grid-gap: 5px;
     position: relative;
