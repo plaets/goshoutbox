@@ -30,7 +30,6 @@ class MessageControls {
 
     send() {
         this.sendListener(this.input.value);
-        this.resetMessageInput();
     }
 
     resetMessageInput() {

@@ -16,7 +16,13 @@ document.addEventListener("DOMContentLoaded", () => {
         }, () => {});
 
         ui.messageControls.setSendListener((text) => {
+            if(text.length >= 1024*10) {
+                ui.statusBar.setError("message is too long");
+                return;
+            }
+
             connection.send({type:"sendMessage",content:text});
+            ui.messageControls.resetMessageInput();
         });
 
         connection.setHandler("message", (data) => {
