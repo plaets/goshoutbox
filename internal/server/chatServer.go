@@ -12,8 +12,9 @@ import (
 type ChatServer struct {
     users []*ChatUser
     usersMutex sync.Mutex
-    mux *http.ServeMux
     messageLog MessageLog
+    logMutex sync.Mutex
+    mux *http.ServeMux
 }
 
 func NewChatServer() *ChatServer {
@@ -21,7 +22,7 @@ func NewChatServer() *ChatServer {
 
     fsServer := http.FileServer(http.Dir("web/static"))
     mux := http.NewServeMux()
-    server := &ChatServer{make([]*ChatUser, 0), sync.Mutex{}, mux, NewMessageLog(50)}
+    server := &ChatServer{make([]*ChatUser, 0), sync.Mutex{}, NewMessageLog(50), sync.Mutex{}, mux}
 
     mux.Handle("/", fsServer)
     mux.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
@@ -159,12 +160,18 @@ func (server *ChatServer) sendMessage(user *ChatUser, message string) {
     }
 
     msg := Message{MessageType, message, user.username, time.Now().Unix()}
+
+    server.logMutex.Lock()
     server.messageLog.AddMessage(&msg)
+    server.logMutex.Unlock()
+
     server.broadcastMessage(msg)
 }
 
 func (server *ChatServer) getHistory(user *ChatUser) {
+    server.logMutex.Lock()
     msg, err := json.Marshal(History{HistoryType, server.messageLog.log})
+    server.logMutex.Unlock()
 
     if err != nil {
         logger.Println(err)
