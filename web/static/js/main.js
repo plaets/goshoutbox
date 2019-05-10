@@ -45,6 +45,10 @@ document.addEventListener("DOMContentLoaded", () => {
             ui.statusBar.setMessage("users: " + ui.userList.usersNum());
         });
 
+        connection.setHandler("history", (data) => {
+            data.content.forEach((m) => ui.messageList.addMessage(new Message(m.from, m.content, m.timestamp)));
+        });
+
         let errorHandlers = {
             "usernameTaken": () => { 
                 let usernamePrompt = new Prompt("user with choosen username already exists, please choose another username", 
@@ -89,6 +93,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
         connection.send({type:"getUserList"});
+        connection.send({type:"getHistory"});
     });
 });
 

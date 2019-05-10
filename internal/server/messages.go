@@ -21,6 +21,7 @@ var unknownError, _ = json.Marshal(map[string]string{"type":ErrorType,"message":
 const (
     UserListType = "userList"
     MessageType = "message"
+    HistoryType = "history"
     UserDisconnectedType = "userDisconnected"
     UserConnectedType = "userConnected"
     ErrorType = "error"
@@ -39,6 +40,11 @@ type Message struct {
     Timestamp int64 `json:"timestamp"`
 }
 
+type History struct {
+    Type string `json:"type"`
+    Content []MessageLogEntry `json:"content"`
+}
+
 type UserDisconnected struct {
     Type string `json:"type"`
     Username string `json:"username"`
@@ -53,6 +59,7 @@ type UserConnected struct {
 
 const (
     GetUserListType = "getUserList"
+    GetHistoryType = "getHistory"
     SendMessageType = "sendMessage"
     SetUsernameType = "setUsername"
 )
@@ -69,4 +76,8 @@ type SendMessage struct {
 type SetUsername struct {
     Type string `json:"type"`
     Username string `json:"username"`
+}
+
+type GetHistory struct {
+    Type string `json:"type"`
 }
