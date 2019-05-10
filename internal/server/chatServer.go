@@ -37,8 +37,8 @@ func NewChatServer() *ChatServer {
         go server.loop(user)
     })
 
-    //http.ListenAndServe(":9000", mux)
-    http.ListenAndServeTLS(":9001", "server.crt", "server.key", mux)
+    http.ListenAndServe(":9000", mux)
+    //http.ListenAndServeTLS(":9001", "server.crt", "server.key", mux)
 
     return server
 }
