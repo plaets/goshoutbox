@@ -13,6 +13,7 @@ type ChatServer struct {
     users []*ChatUser
     usersMutex sync.Mutex
     mux *http.ServeMux
+    messageLog MessageLog
 }
 
 func NewChatServer() *ChatServer {
@@ -20,7 +21,7 @@ func NewChatServer() *ChatServer {
 
     fsServer := http.FileServer(http.Dir("web/static"))
     mux := http.NewServeMux()
-    server := &ChatServer{make([]*ChatUser, 0), sync.Mutex{}, mux}
+    server := &ChatServer{make([]*ChatUser, 0), sync.Mutex{}, mux, NewMessageLog(50)}
 
     mux.Handle("/", fsServer)
     mux.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
@@ -90,12 +91,13 @@ func (server *ChatServer) handleMessage(user *ChatUser, data map[string]interfac
         })
 
         if err == nil {
-            logger.Println(err)
             user.connection.writeChannel <-msg
         } else {
             logger.Println(err)
             user.connection.writeChannel <-unknownError
         }
+    case GetHistoryType:
+        server.getHistory(user)
     case SetUsernameType:
         if data["username"] == nil {
             user.connection.writeChannel <-usernameInvalid
@@ -156,7 +158,20 @@ func (server *ChatServer) sendMessage(user *ChatUser, message string) {
         return
     }
 
-    server.broadcastMessage(Message{MessageType, message, user.username, time.Now().Unix()})
+    msg := Message{MessageType, message, user.username, time.Now().Unix()}
+    server.messageLog.AddMessage(&msg)
+    server.broadcastMessage(msg)
+}
+
+func (server *ChatServer) getHistory(user *ChatUser) {
+    msg, err := json.Marshal(History{HistoryType, server.messageLog.log})
+
+    if err != nil {
+        logger.Println(err)
+        return
+    }
+
+    user.connection.writeChannel <- msg
 }
 
 func (server *ChatServer) broadcastMessage(val interface{}) {
