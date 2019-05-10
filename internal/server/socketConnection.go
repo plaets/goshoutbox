@@ -3,6 +3,7 @@ package server
 import (
     "github.com/gorilla/websocket"
     "time"
+    "fmt"
 )
 
 const (
@@ -21,6 +22,7 @@ type SocketConnection struct {
     readChannel chan []byte
     writeChannel chan []byte
     controlChannel chan int
+    connectionClosed bool
 }
 
 func NewSocketConnection(connection *websocket.Conn) *SocketConnection {
@@ -29,6 +31,7 @@ func NewSocketConnection(connection *websocket.Conn) *SocketConnection {
         writeChannel: make(chan []byte),
         readChannel: make(chan []byte),
         controlChannel: make(chan int),
+        connectionClosed: false,
     }
 
     logger.Println("new connection")
@@ -49,14 +52,14 @@ func (conn *SocketConnection) readLoop() {
 
     defer func() {
         close(conn.readChannel)
+        recover() //lol
         //logger.Println("read loop stopped")
     }()
 
     for {
         _, message, err := conn.connection.ReadMessage()
-        logger.Println("got a message")
         if err != nil {
-            logger.Println(err)
+            logger.Println(fmt.Sprintf("error when reading a message: %s", err))
             conn.controlChannel <-controlClose
             return
         }
@@ -77,15 +80,16 @@ func (conn *SocketConnection) writeLoop() {
     for {
         select {
             case message, ok := <-conn.writeChannel:
-                logger.Println("writing")
                 conn.connection.SetWriteDeadline(time.Now().Add(writeTimeout))
                 if !ok {
-                    conn.controlChannel <-controlClose
                     return
                 }
 
                 w, err := conn.connection.NextWriter(websocket.TextMessage)
-                if logError(err) { return }
+                if err != nil {
+                    logger.Println(fmt.Sprintf("error when getting a writer: %s", err))
+                    return
+                }
                 w.Write(message)
                 w.Close()
             case control, _ := <-conn.controlChannel:
@@ -98,7 +102,7 @@ func (conn *SocketConnection) writeLoop() {
             case <-timer.C:
                 conn.connection.SetWriteDeadline(time.Now().Add(writeTimeout))
                 if err := conn.connection.WriteMessage(websocket.PingMessage, nil); err != nil {
-                        logger.Println(err)
+                    logger.Println(err)
                     return
                 }
         }
