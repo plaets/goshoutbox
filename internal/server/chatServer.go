@@ -161,6 +161,8 @@ func (server *ChatServer) sendMessage(user *ChatUser, message string) {
 
     msg := Message{MessageType, message, user.username, time.Now().Unix()}
 
+    logger.Println(fmt.Sprintf("message from %s: %s", user.username, message))
+
     server.logMutex.Lock()
     server.messageLog.AddMessage(&msg)
     server.logMutex.Unlock()
