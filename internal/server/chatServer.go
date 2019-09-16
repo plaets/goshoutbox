@@ -15,14 +15,15 @@ type ChatServer struct {
     messageLog MessageLog
     logMutex sync.Mutex
     mux *http.ServeMux
+    config map[string]interface{}
 }
 
-func NewChatServer() *ChatServer {
+func NewChatServer(config map[string]interface{}) *ChatServer {
     logger.Println("starting the chat server")
 
     fsServer := http.FileServer(http.Dir("web/static"))
     mux := http.NewServeMux()
-    server := &ChatServer{make([]*ChatUser, 0), sync.Mutex{}, NewMessageLog(50), sync.Mutex{}, mux}
+    server := &ChatServer{make([]*ChatUser, 0), sync.Mutex{}, NewMessageLog(50), sync.Mutex{}, mux, config}
 
     mux.Handle("/", fsServer)
     mux.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
@@ -38,10 +39,38 @@ func NewChatServer() *ChatServer {
         go server.loop(user)
     })
 
-    http.ListenAndServe(":9000", mux)
-    //http.ListenAndServeTLS(":9001", "server.crt", "server.key", mux)
-
+    startServers(server)
     return server
+}
+
+func startServers(server *ChatServer) {
+    serverConfig := server.config["server"].(map[string]interface{})
+
+    var waitGroup sync.WaitGroup
+    waitGroup.Add(1)
+    if serverConfig["tls"] != nil {
+        waitGroup.Add(1)
+    }
+
+    go func() {
+        if err := http.ListenAndServe(serverConfig["addr"].(string), server.mux); err != nil { //good code
+            logger.Panic("failed to start http server: ", err)
+        }
+        waitGroup.Done()
+    }()
+
+    if serverConfig["tls"] != nil {
+        tlsConfig := serverConfig["tls"].(map[string]interface{})
+        go func() {
+            err := http.ListenAndServeTLS(tlsConfig["addr"].(string), tlsConfig["cert"].(string), tlsConfig["key"].(string), server.mux)
+            if err != nil {
+                logger.Panic("failed to start https server: ", err)
+            }
+            waitGroup.Done()
+        }()
+    }
+
+    waitGroup.Wait()
 }
 
 func (server *ChatServer) loop(user *ChatUser) {
@@ -222,3 +251,4 @@ func (server *ChatServer) userDisconnected(user *ChatUser) {
 //especially if there are many messages sent at once or the latency is big.
 //this however means that more data will be sent and wasted. not a lot but still.
 //also, the number of users this server can handle is probably is too small to think about things like this anyway
+//update (3 months after writing this): why the fuck do i care
