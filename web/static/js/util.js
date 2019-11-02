@@ -5,7 +5,7 @@ function formatZero(string, length) {
 }
 
 function htmlEncode(string) {
-    return [[/</g, "&lt"], [/>/g, "&gt"], [/"/g, "&#34"], [/'/g, "&#39"]].reduce((p, v) => p.replace(v[0],v[1]), string);
+    return [[/</g, "&lt"], [/>/g, "&gt"], [/"/g, "&#34"], [/'/g, "&#39"]].reduce((p, v) => p.replace(v[0],v[1]), string); //fully safe!!!!! 
 }
 
 class Deferred {

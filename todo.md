@@ -7,7 +7,7 @@
 
 ### future
 
-* authentication plugins / reserving nicks
+* authentication plugins / reserving nicknames
 * channels
 * more sophisticated logging/history
 * stats

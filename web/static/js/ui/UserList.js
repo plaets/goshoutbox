@@ -16,7 +16,7 @@ class UserList {
     }
 
     addUser(username) {
-        if(username != "" && this.users.find((e) => e.username == username) == undefined) { //performance? lol
+        if(username != "" && this.users.find((e) => e.username == username) == undefined) { 
             let user = new UserEntry(username);
             this.users.push(user);
             this.DOM.append(user.DOM);
