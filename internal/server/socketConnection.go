@@ -67,7 +67,7 @@ func (conn *SocketConnection) readLoop() {
     }
 }
 
-//heacily inspired by https://github.com/gorilla/websocket/blob/master/examples/chat/client.go
+//heavily inspired by https://github.com/gorilla/websocket/blob/master/examples/chat/client.go
 func (conn *SocketConnection) writeLoop() {
     timer := time.NewTicker(pingPeriod)
 

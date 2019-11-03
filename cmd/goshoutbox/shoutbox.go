@@ -19,7 +19,7 @@ func main() {
     //    }
     //}()
 
-    var configFile = flag.String("config", "config.json", "configuration file")
+    var configFile = flag.String("config", "config.json", "configuration file") //json is a bad configuration language
     flag.Parse()
 
     var configData, err = ioutil.ReadFile(*configFile)

@@ -245,10 +245,3 @@ func (server *ChatServer) userDisconnected(user *ChatUser) {
         server.broadcastMessage(UserDisconnected{UserDisconnectedType, username})
     }
 }
-
-//message will be sent back to the user that sent it. 
-//i think (hope) that this will make the message timeline more consistent across users,
-//especially if there are many messages sent at once or the latency is big.
-//this however means that more data will be sent and wasted. not a lot but still.
-//also, the number of users this server can handle is probably is too small to think about things like this anyway
-//update (3 months after writing this): why the fuck do i care
