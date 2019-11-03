@@ -1,7 +1,7 @@
 "use strict";
 
 document.addEventListener("DOMContentLoaded", () => {
-    let connection = new ChatConnection("wss://" + location.host + location.pathname + "ws");
+    let connection = new ChatConnection((location.protocol == "https:" ? "wss://" : "ws://")+ location.host + location.pathname + "ws"); //probably a bad idea
     connection.setHandler("default", console.log);
 
     let ui = new Layout();
