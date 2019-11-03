@@ -31,9 +31,9 @@ Simple websocket shoutbox written in go and pure javascript
 
 Configuration is stored in the `config.json` file. Example configuration can be seen in `example-config.json`.
 
-```json
+```
 {
-    "server": {
+    "server": { 
         "addr": ":9000", //address that the server should bind to, here ':9000' means 'listen on port 9000'
         "tls": { //optional ssl config
             "addr": ":9001", //address of the ssl socket
