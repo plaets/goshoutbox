@@ -4,10 +4,11 @@ Simple websocket shoutbox written in go and pure javascript
 
 ## Setup
 
-* Install go https://golang.org/doc/install
+* Install go <https://golang.org/doc/install>
 * Run `go get github.com/plaets/goshoutbox/cmd/goshoutbox/` and navigate to `$GOPATH/src/github.com/plaets/goshoutbox`
 * Rename `example-config.json` to `config.json`, modify it (for example, delete the tls section, otherwise the server won't start until you provide the ssl certificates - of course that is not a good idea in practice, but it's ok just for testing the server out)
 * Run `go run github.com/plaets/goshoutbox/cmd/goshoutbox/` or `go build github.com/plaets/goshoutbox/cmd/goshoutbox/` and run the resulting executable. The `web` directory should be in your working directory, otherwise you won't be able to access the javascript client. 
+* Open `http://localhost:9000` in your browser (or `https://localhost:9001` if https is enabled)
 
 ## Configuration 
 
@@ -22,7 +23,7 @@ Configuration is stored in the `config.json` file. Example configuration can be 
 
 ## Todo
 
-* Configuration
+* More configuration options
 * Custom emoticons
 * Basic markdown
 * Private messages 
@@ -30,15 +31,16 @@ Configuration is stored in the `config.json` file. Example configuration can be 
 * Flooding prevention
 * Maybe rewrite the UI in something maintainable 
 * Maybe actually *design* the UI
-
-### Future
-
-* Authentication plugins / reserving nicknames
+* Authentication plugins/reserving nicknames
 * Channels
 * More sophisticated logging/history
 * Stats
-* Filters (word, links, etc)
+* Filters (delete messages containing words, links, etc. probably better as a plugin)
 * Admin notifications
+
+## Dependencies
+
+* https://github.com/gorilla/websocket
 
 ## Screenshots
 
