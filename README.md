@@ -6,7 +6,7 @@ Simple websocket shoutbox written in go and pure javascript
 
 * Install go https://golang.org/doc/install
 * Copy `example-config.json` to your working directory, rename it to `config.json`, modify it (for example, delete the tls section, otherwise the server won't start until you provide the ssl certificates - of course that is not a good idea in practice, but it's ok just for testing the server out)
-* Run `go run github.com/plaets/goshoutbox/cmd/goshoutbox/` or `go build github.com/plaets/goshoutbox/cmd/goshoutbox/` and copy the executable from `$GOPATH/src/github.com/plaets/goshoutbox/cmd/goshoutbox/goshoutbox`
+* Run `go run github.com/plaets/goshoutbox/cmd/goshoutbox/` or `go build github.com/plaets/goshoutbox/cmd/goshoutbox/` and run the resulting executable
 
 ## Configuration 
 
@@ -28,6 +28,7 @@ Configuration is stored in the `config.json` file. Example configuration can be 
 * Basic administration
 * Flooding prevention
 * Maybe rewrite the UI in something maintainable 
+* Maybe actually *design* the UI
 
 ### Future
 
