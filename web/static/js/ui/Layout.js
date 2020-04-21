@@ -1,10 +1,10 @@
 "use strict";
 
 class Layout {
-    constructor() {
+    constructor(config) {
         this.DOM = document.createElement("div");
         this.DOM.classList.add("shoutbox");
-        
+
         this.messageList = new MessageList();
         this.messageControls = new MessageControls();
         this.userList = new UserList();

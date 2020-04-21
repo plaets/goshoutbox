@@ -22,6 +22,7 @@ const (
     UserListType = "userList"
     MessageType = "message"
     HistoryType = "history"
+    EmojisType = "emojis"
     UserDisconnectedType = "userDisconnected"
     UserConnectedType = "userConnected"
     ErrorType = "error"
@@ -55,16 +56,30 @@ type UserConnected struct {
     Username string `json:"username"`
 }
 
+type Emojis struct {
+    Type string `json:"type"`
+    Emojis []string `json:"emojis"`
+}
+
 //client - i really hate the fact that i have to move my files to another folder just to have namespaces (packages)
 
 const (
     GetUserListType = "getUserList"
     GetHistoryType = "getHistory"
+    GetEmojisType = "getEmojis"
     SendMessageType = "sendMessage"
     SetUsernameType = "setUsername"
 )
 
 type GetUserList struct {
+    Type string `json:"type"`
+}
+
+type GetHistory struct {
+    Type string `json:"type"`
+}
+
+type GetEmojis struct {
     Type string `json:"type"`
 }
 
@@ -76,8 +91,4 @@ type SendMessage struct {
 type SetUsername struct {
     Type string `json:"type"`
     Username string `json:"username"`
-}
-
-type GetHistory struct {
-    Type string `json:"type"`
 }

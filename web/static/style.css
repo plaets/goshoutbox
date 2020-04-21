@@ -19,6 +19,17 @@ body {
     position: relative;
 }
 
+.shoutbox .emoji {
+    height: 1.5em;
+}
+
+.shoutbox .button {
+    border: none;
+    border-bottom: 1px solid black;
+    background-color: WhiteSmoke;
+    margin: 10px;
+}
+
 /* userList */
 .shoutbox .userList {
     font-size: 1em;
@@ -81,11 +92,11 @@ body {
 }
 
 .shoutbox .messageControls .sendButton {
-    border: none;
-    border-bottom: 1px solid black;
-    margin: 10px;
     width: 15%;
-    background-color: WhiteSmoke;
+}
+
+.shoutbox .messageControls .emojisButton {
+    width: 15%;
 }
 
 /* messageList */
@@ -134,7 +145,9 @@ body {
 }
 
 .prompt {
+    max-height: 80%;
     width: 20rem;
+
     background-color: white;
     border: 1px solid black;
 
@@ -143,6 +156,10 @@ body {
     display: grid;
 
     grid-gap: 5px;
+}
+
+.alert {
+    grid-template-rows: 3fr 50px;
 }
 
 .prompt * {
@@ -160,6 +177,11 @@ body {
 
 .prompt .labelWrapper * {
     text-align: center;
+    margin: auto;
+}
+
+.alert .labelWrapper {
+    overflow-y: auto;
 }
 
 .prompt .input {
@@ -171,6 +193,11 @@ body {
 .prompt .confirmButton {
     grid-column: 3 / span 1;
     grid-row: 3 / 3;
+}
+
+.alert .confirmButton {
+    grid-column: 3 / span 1;
+    grid-row: 2 / span 1;
 }
 
 .prompt .cancelButton {

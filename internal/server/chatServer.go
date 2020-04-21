@@ -5,7 +5,11 @@ import (
     "github.com/gorilla/websocket"
     "encoding/json"
     "time"
+    "strings"
     "fmt"
+    "io"
+    "os"
+    "strconv"
     "sync"
 )
 
@@ -15,17 +19,24 @@ type ChatServer struct {
     messageLog MessageLog
     logMutex sync.Mutex
     mux *http.ServeMux
+    emojis []string
     config map[string]interface{}
 }
 
 func NewChatServer(config map[string]interface{}) *ChatServer {
     logger.Println("starting the chat server")
 
+    emojis := make([]string, 0)
+    for _, v := range config["emoji"].([]interface{}) {
+        emojis = append(emojis, v.(map[string]interface{})["name"].(string))
+    }
+
     fsServer := http.FileServer(http.Dir("web/static"))
     mux := http.NewServeMux()
-    server := &ChatServer{make([]*ChatUser, 0), sync.Mutex{}, NewMessageLog(50), sync.Mutex{}, mux, config}
+    server := &ChatServer{make([]*ChatUser, 0), sync.Mutex{}, NewMessageLog(50), sync.Mutex{}, mux, emojis, config}
 
     mux.Handle("/", fsServer)
+    mux.HandleFunc("/emoji/", getEmoji(server))
     mux.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
         conn, err := websocket.Upgrade(w, r, nil, 1024, 1024)
         if logError(err) { return }
@@ -134,6 +145,8 @@ func (server *ChatServer) handleMessage(user *ChatUser, data map[string]interfac
         } else {
             server.setUsername(user, data["username"].(string))
         }
+    case GetEmojisType:
+        server.getEmojis(user)
     default:
         user.connection.writeChannel <-unknownTypeError
     }
@@ -212,6 +225,19 @@ func (server *ChatServer) getHistory(user *ChatUser) {
     user.connection.writeChannel <- msg
 }
 
+func (server *ChatServer) getEmojis(user *ChatUser) {
+    server.logMutex.Lock()
+    msg, err := json.Marshal(Emojis{EmojisType, server.emojis})
+    server.logMutex.Unlock()
+
+    if err != nil {
+        logger.Println(err)
+        return
+    }
+
+    user.connection.writeChannel <- msg
+}
+
 func (server *ChatServer) broadcastMessage(val interface{}) {
     msg, err := json.Marshal(val)
     if err == nil {
@@ -244,4 +270,44 @@ func (server *ChatServer) userDisconnected(user *ChatUser) {
         logger.Println(fmt.Sprintf("users left: %d", len(server.users)))
         server.broadcastMessage(UserDisconnected{UserDisconnectedType, username})
     }
+}
+
+func getEmoji(server *ChatServer) func(http.ResponseWriter, *http.Request) {
+    return func(w http.ResponseWriter, r *http.Request) {
+        emojiName := strings.TrimPrefix(r.URL.Path, "/emoji/")
+        for _, v := range server.config["emoji"].([]interface{}) {
+            if v.(map[string]interface{})["name"].(string) == emojiName {
+                sendImage(v.(map[string]interface{})["path"].(string), w)
+                return
+            }
+        }
+
+        httpError(w, 404, "emoji not found")
+        return
+    }
+}
+
+func sendImage(path string, w http.ResponseWriter) {
+    file, err := os.Open(path)
+    defer file.Close()
+    if err != nil {
+        logger.Printf("error: couldn't access image %s", path)
+        httpError(w, 404, "couldn't access the file")
+        return
+    }
+
+    header := make([]byte, 512)
+    file.Read(header)
+    contentType := http.DetectContentType(header)
+
+    stat, _ := file.Stat()
+    size := strconv.FormatInt(stat.Size(), 10)
+
+    //w.Header().Set("Content-Disposition", "attachment; filename="+stat.Name())
+    w.Header().Set("Content-Type", contentType)
+    w.Header().Set("Content-Length", size)
+
+    file.Seek(0, 0)
+    io.Copy(w, file)
+    return
 }

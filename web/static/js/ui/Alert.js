@@ -1,12 +1,14 @@
 "use strict";
 
-class Prompt {
-    constructor(label, placeholder="", activate=false) {
+class Alert {
+    constructor(label, activate=false) {
         this.DOM = document.createElement("div");
         this.DOM.classList.add("promptWrapper");
+        this.DOM.classList.add("alertWrapper");
 
-        this.prompt = document.createElement("div");
-        this.prompt.classList.add("prompt");
+        this.alert = document.createElement("div");
+        this.alert.classList.add("prompt");
+        this.alert.classList.add("alert");
 
         this.labelWrapper = document.createElement("div");
         this.labelWrapper.classList.add("labelWrapper");
@@ -17,25 +19,17 @@ class Prompt {
 
         this.labelWrapper.append(this.label);
 
-        this.input = document.createElement("input");
-        this.input.classList.add("input");
-        this.input.placeholder = placeholder;
-
         this.confirmButton = document.createElement("button");
         this.confirmButton.classList.add("confirmButton");
         this.confirmButton.innerText = "ok";
 
-        this.cancelButton = document.createElement("button");
-        this.cancelButton.classList.add("cancelButton");
-        this.cancelButton.innerText = "cancel";
-
-        this.prompt.append(this.labelWrapper, this.input, this.cancelButton, this.confirmButton);
-        this.DOM.append(this.prompt);
+        this.alert.append(this.labelWrapper, this.confirmButton);
+        this.DOM.append(this.alert);
 
         this.setupButtons();
 
         if(activate) {
-            this.prompt.focus();
+            this.alert.focus();
         }
     }
 
@@ -44,11 +38,6 @@ class Prompt {
 
         this.confirmButton.addEventListener("click", () => {
             this.resolve();
-        });
-
-        this.cancelButton.addEventListener("click", () => {
-            this.DOM.parentElement.removeChild(this.DOM);
-            this.promise.reject(this.input.value);
         });
 
         document.addEventListener("keypress", (e) => {
@@ -60,14 +49,14 @@ class Prompt {
 
     resolve() {
         this.DOM.parentElement.removeChild(this.DOM);
-        this.promise.resolve(this.input.value);
+        this.promise.resolve();
     }
 
     getPromise() {
         return this.promise;
     }
-
+    
     activate() {
-        this.prompt.focus();
+        this.alert.focus();
     }
 }

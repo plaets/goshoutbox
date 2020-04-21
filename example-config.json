@@ -6,5 +6,8 @@
             "key": "server.key",
             "cert": "server.crt"
         }
-    }
+    },
+    "emoji": [
+        { "name": "crying", "path": "./emojis/crying.png" }
+    ]
 }

@@ -1,11 +1,25 @@
 "use strict";
 
 document.addEventListener("DOMContentLoaded", () => {
-    let connection = new ChatConnection((location.protocol == "https:" ? "wss://" : "ws://")+ location.host + location.pathname + "ws"); //probably a bad idea
+    let connection = new ChatConnection((location.protocol == "https:" ? "wss://" : "ws://") + location.host + location.pathname + "ws"); //probably a bad idea
     connection.setHandler("default", console.log);
 
     let ui = new Layout();
     document.body.append(ui.DOM);
+
+    let emojis = {};
+
+    function parseEmojis(message) {
+        let foundEmojis = [...new Set(message.match(/:[a-z_\-]*:/gm))];
+        for(let n of foundEmojis) {
+            let emoji = emojis[n.substr(1, n.length-2)];
+            if(emoji != undefined) {
+               message = message.replace(n, emoji.outerHTML);
+            }
+        }
+
+        return message;
+    }
 
     connection.openPromise().then(() => {
         let usernamePrompt = new Prompt("enter your username", "username");
@@ -14,6 +28,12 @@ document.addEventListener("DOMContentLoaded", () => {
         usernamePrompt.getPromise().then((username) => {
             connection.send({type:"setUsername",username:username});
         }, () => {});
+
+        ui.messageControls.setShowEmojisListener(() => {
+            let emojiList = new EmojiList(emojis);
+            ui.DOM.append(emojiList.DOM);
+            emojiList.activate();
+        });
 
         ui.messageControls.setSendListener((text) => {
             if(text.length >= 1024*10) {
@@ -27,7 +47,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
         connection.setHandler("message", (data) => {
             console.log(data);
-            ui.messageList.addMessage(new Message(data.from, data.content, data.timestamp));
+            let message = new Message(data.from, data.content, data.timestamp);
+            message.content.innerHTML = parseEmojis(message.content.innerHTML);
+            ui.messageList.addMessage(message);
         });
 
         connection.setHandler("userConnected", (data) => {
@@ -46,7 +68,21 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
         connection.setHandler("history", (data) => {
-            data.content.forEach((m) => ui.messageList.addMessage(new Message(m.from, m.content, m.timestamp)));
+            data.content.forEach((m) => {
+                let message = new Message(m.from, m.content, m.timestamp);
+                message.content.innerHTML = parseEmojis(message.content.innerHTML);
+                ui.messageList.addMessage(message);
+            });
+        });
+
+        connection.setHandler("emojis", (data) => {
+            for(let n of data.emojis) {
+                let img =  new Image();
+                img.src = `${location.protocol + "//" + location.host + location.pathname}emoji/${n}`;
+                img.classList.add("emoji");
+                emojis[n] = img;
+            }
+            console.log(emojis);
         });
 
         let errorHandlers = {
@@ -93,6 +129,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
         connection.send({type:"getUserList"});
+        connection.send({type:"getEmojis"});
         connection.send({type:"getHistory"});
     });
 });

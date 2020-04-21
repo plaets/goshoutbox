@@ -1,6 +1,8 @@
 package server
 
 import (
+    "net/http"
+    "fmt"
     "github.com/gorilla/websocket"
     "log"
     "os"
@@ -37,6 +39,11 @@ func sendError(err error, errbody []byte, conn *SocketConnection) bool {
         return true
     }
     return false
+}
+
+func httpError(w http.ResponseWriter, code int, message string) {
+    w.WriteHeader(code)
+    fmt.Fprintf(w, "{\"error\": \"%s\"}", message)
 }
 
 func sendErrorAndDisconnect(err error, errbody []byte, conn *SocketConnection) bool {
