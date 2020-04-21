@@ -10,11 +10,11 @@ document.addEventListener("DOMContentLoaded", () => {
     let emojis = {};
 
     function parseEmojis(message) {
-        let foundEmojis = [...new Set(message.match(/:[a-z_\-]*:/gm))];
+        let foundEmojis = [...new Set(message.match(/:([a-z_\-]*):/gm))];
         for(let n of foundEmojis) {
             let emoji = emojis[n.substr(1, n.length-2)];
             if(emoji != undefined) {
-               message = message.replace(n, emoji.outerHTML);
+               message = message.replace(new RegExp(n, 'gm'), emoji.outerHTML);
             }
         }
 
