@@ -93,10 +93,8 @@ class Shoutbox {
                     this.addMessage(m);
                 } else {
                     let message = undefined;
-                    if(m.type == "join") {
-                        message = new UserStatusMessage(m.content, m.timestamp, "has joined");
-                    } else if(m.type == "exit") {
-                        message = new UserStatusMessage(m.content, m.timestamp, "has left");
+                    if(m.type == "joined" || m.type == "left") {
+                        message = new UserStatusMessage(m.content, m.timestamp, `has ${m.type}`);
                     }
                     this.ui.messageList.addMessage(message);
                 }

@@ -6,8 +6,9 @@ import (
 
 const (
     MessageLogEntryUserMessage = "msg"
-    MessageLogEntryJoinMessage = "join"
-    MessageLogEntryExitMessage = "exit"
+    MessageLogEntryJoinedMessage = "joined"
+    MessageLogEntryLeftMessage = "left"
+    MessageLogEntryFromServer = "server"
 )
 
 type MessageLogEntry struct {
@@ -34,17 +35,20 @@ func (log *MessageLog) checkLogLimit() {
 
 func (log *MessageLog) AddMessage(message *Message) {
     log.checkLogLimit()
-    log.log = append(log.log, MessageLogEntry{message.From, MessageLogEntryUserMessage, message.Content, message.Timestamp})
+    log.log = append(log.log, MessageLogEntry{message.From,
+        MessageLogEntryUserMessage, message.Content, message.Timestamp})
 }
 
 func (log *MessageLog) AddExitMessage(username string) {
     log.checkLogLimit()
-    log.log = append(log.log, MessageLogEntry{"server", MessageLogEntryExitMessage, username, time.Now().Unix()})
+    log.log = append(log.log, MessageLogEntry{MessageLogEntryFromServer,
+        MessageLogEntryLeftMessage, username, time.Now().Unix()})
 }
 
 func (log *MessageLog) AddJoinMessage(username string) {
     log.checkLogLimit()
-    log.log = append(log.log, MessageLogEntry{"server", MessageLogEntryJoinMessage, username, time.Now().Unix()})
+    log.log = append(log.log, MessageLogEntry{MessageLogEntryFromServer,
+        MessageLogEntryJoinedMessage, username, time.Now().Unix()})
 }
 
 func (log *MessageLog) RemoveLastMessage() {

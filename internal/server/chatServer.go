@@ -85,7 +85,6 @@ func startServers(server *ChatServer) {
 }
 
 func (server *ChatServer) loop(user *ChatUser) {
-    //send a banner
     defer func() {
         server.userDisconnected(user)
         //logger.Println(fmt.Sprintf("loop for user %s stopped", user.username))
@@ -315,7 +314,6 @@ func sendImage(path string, w http.ResponseWriter) {
     stat, _ := file.Stat()
     size := strconv.FormatInt(stat.Size(), 10)
 
-    //w.Header().Set("Content-Disposition", "attachment; filename="+stat.Name())
     w.Header().Set("Content-Type", contentType)
     w.Header().Set("Content-Length", size)
 

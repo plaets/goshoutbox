@@ -61,7 +61,7 @@ type Emojis struct {
     Emojis []string `json:"emojis"`
 }
 
-//client - i really hate the fact that i have to move my files to another folder just to have namespaces (packages)
+//client 
 
 const (
     GetUserListType = "getUserList"
