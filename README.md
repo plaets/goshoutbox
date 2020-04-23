@@ -25,7 +25,6 @@ Configuration is stored in the `config.json` file. Example configuration can be 
 
 ## Todo
 
-* User join/exit message
 * More configuration options
 * Basic markdown
 * Private messages 
