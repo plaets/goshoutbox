@@ -66,20 +66,16 @@ class Shoutbox {
             this.addMessage(data);
         });
 
-        this.connection.setHandler("userConnected", (data) => {
+        this.connection.setHandler("userJoined", (data) => {
             this.ui.userList.addUser(data.username);
             this.updateUserNumber();
-
-            let message = new UserStatusMessage(data.username, now(), "has joined");
-            this.ui.messageList.addMessage(message);
+            this.ui.messageList.addMessage(new UserStatusMessage(data.username, now(), "has joined"));
         });
 
-        this.connection.setHandler("userDisconnected", (data) => {
+        this.connection.setHandler("userLeft", (data) => {
             this.ui.userList.removeUser(data.username);
             this.updateUserNumber();
-
-            let message = new UserStatusMessage(data.username, now(), "has left");
-            this.ui.messageList.addMessage(message);
+            this.ui.messageList.addMessage(new UserStatusMessage(data.username, now(), "has left"));
         });
 
         this.connection.setHandler("userList", (data) => {
@@ -91,12 +87,8 @@ class Shoutbox {
             data.content.forEach((m) => {
                 if(m.type == "msg") {
                     this.addMessage(m);
-                } else {
-                    let message = undefined;
-                    if(m.type == "joined" || m.type == "left") {
-                        message = new UserStatusMessage(m.content, m.timestamp, `has ${m.type}`);
-                    }
-                    this.ui.messageList.addMessage(message);
+                } else if(m.type == "joined" || m.type == "left") {
+                    this.ui.messageList.addMessage(new UserStatusMessage(m.content, m.timestamp, `has ${m.type}`));
                 }
             });
         });

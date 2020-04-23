@@ -14,7 +14,7 @@ const (
 type MessageLogEntry struct {
     From string `json:"from"`
     Type string `json:"type"`
-    Content string `json:"content"` //contains username if message type is exit or join
+    Content string `json:"content"` //contains username if message type is left or join
     Timestamp int64 `json:"timestamp"`
 }
 

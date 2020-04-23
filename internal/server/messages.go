@@ -23,8 +23,8 @@ const (
     MessageType = "message"
     HistoryType = "history"
     EmojisType = "emojis"
-    UserDisconnectedType = "userDisconnected"
-    UserConnectedType = "userConnected"
+    UserLeftType = "userLeft"
+    UserJoinedType = "userJoined"
     ErrorType = "error"
     SuccessType = "success"
 )
@@ -46,12 +46,12 @@ type History struct {
     Content []MessageLogEntry `json:"content"`
 }
 
-type UserDisconnected struct {
+type UserLeft struct {
     Type string `json:"type"`
     Username string `json:"username"`
 }
 
-type UserConnected struct {
+type UserJoined struct {
     Type string `json:"type"`
     Username string `json:"username"`
 }

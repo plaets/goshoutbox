@@ -86,7 +86,7 @@ func startServers(server *ChatServer) {
 
 func (server *ChatServer) loop(user *ChatUser) {
     defer func() {
-        server.userDisconnected(user)
+        server.userLeft(user)
         //logger.Println(fmt.Sprintf("loop for user %s stopped", user.username))
     }()
 
@@ -159,13 +159,13 @@ func (server *ChatServer) setUsername(user* ChatUser, username string) {
             } else {
                 user.username = username
                 user.connection.writeChannel <- usernameSet
-                server.broadcastMessage(UserConnected{UserConnectedType, user.username})
+                server.broadcastMessage(UserJoined{UserJoinedType, user.username})
 
                 server.logMutex.Lock()
                 server.messageLog.AddJoinMessage(user.username)
                 server.logMutex.Unlock()
 
-                logger.Println("new user connected: " + username)
+                logger.Println("user " + username + " has joined")
             }
         } else {
             user.connection.writeChannel <- usernameInvalid
@@ -259,7 +259,7 @@ func (server *ChatServer) broadcastBytes(msg []byte) {
     server.usersMutex.Unlock()
 }
 
-func (server *ChatServer) userDisconnected(user *ChatUser) {
+func (server *ChatServer) userLeft(user *ChatUser) {
     username := user.username
     server.usersMutex.Lock()
     for i, v := range server.users {
@@ -277,9 +277,9 @@ func (server *ChatServer) userDisconnected(user *ChatUser) {
     }
 
     if user.username != "" {
-        logger.Println(fmt.Sprintf("user %s disconnected", user.username))
+        logger.Println(fmt.Sprintf("user %s has left", user.username))
         logger.Println(fmt.Sprintf("users left: %d", len(server.users)))
-        server.broadcastMessage(UserDisconnected{UserDisconnectedType, username})
+        server.broadcastMessage(UserLeft{UserLeftType, username})
     }
 }
 
