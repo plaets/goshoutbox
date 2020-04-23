@@ -27,6 +27,7 @@ Configuration is stored in the `config.json` file. Example configuration can be 
 
 * User join/exit message
 * More configuration options
+* Multiline messages
 * Basic markdown
 * Private messages 
 * Basic administration

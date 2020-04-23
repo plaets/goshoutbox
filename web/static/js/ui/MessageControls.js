@@ -5,7 +5,7 @@ class MessageControls {
         this.DOM = document.createElement("div");
         this.DOM.classList.add("messageControls");
 
-        this.input = document.createElement("input");
+        this.input = document.createElement("textarea");
         this.input.classList.add("messageInput");
         this.input.placeholder = "message";
 
@@ -21,7 +21,10 @@ class MessageControls {
 
         document.addEventListener("keypress", (e) => {
             if(e.keyCode == 13 && this.input == document.activeElement) {
-                this.send();
+                if(!e.shiftKey) {
+                    e.preventDefault();
+                    this.send();
+                }
             }
         });
 

@@ -48,11 +48,16 @@ class Shoutbox {
         this.connection.send({type:"getHistory"});
     }
 
+    addMessage(data) {
+        let message = new Message(data.from, data.content, data.timestamp);
+        message.content.innerHTML = this.parseEmojis(message.content.innerHTML);
+        message.content.innerHTML = message.content.innerHTML.replace(/\n/g, "</br>");
+        this.ui.messageList.addMessage(message);
+    }
+
     setupHandlers() {
         this.connection.setHandler("message", (data) => {
-            let message = new Message(data.from, data.content, data.timestamp);
-            message.content.innerHTML = this.parseEmojis(message.content.innerHTML);
-            this.ui.messageList.addMessage(message);
+            this.addMessage(data);
         });
 
         this.connection.setHandler("userConnected", (data) => {
@@ -72,9 +77,7 @@ class Shoutbox {
 
         this.connection.setHandler("history", (data) => {
             data.content.forEach((m) => {
-                let message = new Message(m.from, m.content, m.timestamp);
-                message.content.innerHTML = this.parseEmojis(message.content.innerHTML);
-                this.ui.messageList.addMessage(message);
+                this.addMessage(m);
             });
         });
 

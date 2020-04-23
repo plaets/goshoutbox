@@ -89,6 +89,7 @@ body {
     padding-right: 5px;
     background-color: WhiteSmoke;
     flex-grow: 1;
+    resize: none;
 }
 
 .shoutbox .messageControls .sendButton {
