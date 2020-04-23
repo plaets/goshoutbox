@@ -49,6 +49,14 @@ class ChatConnection {
         this.errorHandler(err);
     }
 
+    close() {
+        try {
+            this.websocket.close();
+        } catch(e) {
+            console.log(e);
+        }
+    }
+
     send(data) {
         this.websocket.send(JSON.stringify(data));
     }

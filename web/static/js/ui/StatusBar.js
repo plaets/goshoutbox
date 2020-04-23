@@ -17,6 +17,7 @@ class StatusBar {
     setMessage(message) {
         this.message = message;
         this.statusBar.innerHTML = message;
+        this.statusBar.classList.remove("error");
     }
 
     setError(message) {
@@ -30,6 +31,11 @@ class StatusBar {
         this.errorTimeout = setTimeout(() => {
             this.statusBar.innerHTML = this.message;
             this.statusBar.classList.remove("error");
-        }, 2000);
+        }, 5000);
+    }
+
+    setPersistentError(message) {
+        this.statusBar.innerHTML = message;
+        this.statusBar.classList.add("error");
     }
 }

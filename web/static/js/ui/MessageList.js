@@ -39,4 +39,9 @@ class MessageList {
         if(this.DOM.scrollHeight - this.DOM.clientHeight <= (this.DOM.scrollTop + message.DOM.clientHeight + 10)) { 
             this.DOM.scrollTop = this.DOM.scrollHeight;
         }
-    } }
+    } 
+
+    clearMessages() {
+        while(this.DOM.lastChild) this.DOM.removeChild(this.DOM.lastChild);
+    }
+}

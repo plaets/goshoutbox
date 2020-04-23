@@ -31,6 +31,11 @@ class UserList {
         }
     }
 
+    clear() {
+        this.users = [];
+        while(this.DOM.lastChild) this.DOM.removeChild(this.DOM.lastChild);
+    }
+
     usersNum() {
         return this.users.length;
     }
