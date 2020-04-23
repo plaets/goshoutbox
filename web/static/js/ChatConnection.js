@@ -51,6 +51,7 @@ class ChatConnection {
 
     close() {
         try {
+            this.errorHandler = () => {};
             this.websocket.close();
         } catch(e) {
             console.log(e);

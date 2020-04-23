@@ -6,6 +6,7 @@ class Shoutbox {
         this.connection = new ChatConnection((location.protocol == "https:" ? "wss://" : "ws://") + location.host + location.pathname + "ws"); //probably a bad idea
         this.lastUsername = "";
         this.emojis = {};
+        this.reconnecting = false;
 
         this.connection.openPromise
             .then(() => this.setupHandlers())
@@ -94,6 +95,7 @@ class Shoutbox {
                     "username", true);
                 this.ui.DOM.append(usernamePrompt.DOM);
                 usernamePrompt.getPromise().then((username) => {
+                    this.lastUsername = username;
                     this.connection.send({type:"setUsername",username:username});
                 }, () => {});
             },
@@ -102,6 +104,7 @@ class Shoutbox {
                     "username", true);
                 this.ui.DOM.append(usernamePrompt.DOM);
                 usernamePrompt.getPromise().then((username) => {
+                    this.lastUsername = username;
                     this.connection.send({type:"setUsername",username:username});
                 }, () => {});
             },
@@ -113,6 +116,7 @@ class Shoutbox {
                     "username", true);
                 this.ui.DOM.append(usernamePrompt.DOM);
                 usernamePrompt.getPromise().then((username) => {
+                    this.lastUsername = username;
                     this.connection.send({type:"setUsername",username:username});
                 }, () => {});
             },
@@ -156,22 +160,27 @@ class Shoutbox {
     }
 
     reconnect() {
+        if(this.reconnecting) return;
+        this.reconnecting = true
+
         this.reconnectInterval = setInterval(() => {
-            this.connection.close(); //close the old connection, not 100% sure if thats needed, it looks like the browser is supposed to close the old connection when a new connection to the same address is initiated
+            this.connection.close(); 
             this.connection = new ChatConnection((location.protocol == "https:" ? "wss://" : "ws://") + location.host + location.pathname + "ws"); 
 
             this.connection.openPromise
                 .then(() => {
                     console.log("reconnected");
                     clearInterval(this.reconnectInterval);
+
                     this.ui.statusBar.setMessage("connected");
                     this.ui.userList.clear();
                     this.connection.send({type:"setUsername",username:this.lastUsername});
+                    this.reconnecting = false;
                 })
                 .then(() => this.setupHandlers())
                 .then(() => this.setupErrorHandlers())
                 .then(() => this.sendInitMessages());
-        }, 1000);
+        }, 5000);
         //TODO: there is a possibility, that after reconnecting all messages will be doubled 
         //(client loses connection, reconnects, asks for history, gets the same old history with maybe few new messages, 
         //appends all the messages from the new history to the old message list)
