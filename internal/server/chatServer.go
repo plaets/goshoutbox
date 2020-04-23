@@ -161,6 +161,11 @@ func (server *ChatServer) setUsername(user* ChatUser, username string) {
                 user.username = username
                 user.connection.writeChannel <- usernameSet
                 server.broadcastMessage(UserConnected{UserConnectedType, user.username})
+
+                server.logMutex.Lock()
+                server.messageLog.AddJoinMessage(user.username)
+                server.logMutex.Unlock()
+
                 logger.Println("new user connected: " + username)
             }
         } else {
@@ -265,6 +270,13 @@ func (server *ChatServer) userDisconnected(user *ChatUser) {
         }
     }
     server.usersMutex.Unlock()
+
+    if username != "" {
+        server.logMutex.Lock()
+        server.messageLog.AddExitMessage(username)
+        server.logMutex.Unlock()
+    }
+
     if user.username != "" {
         logger.Println(fmt.Sprintf("user %s disconnected", user.username))
         logger.Println(fmt.Sprintf("users left: %d", len(server.users)))

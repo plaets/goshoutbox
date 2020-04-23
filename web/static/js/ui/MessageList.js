@@ -1,5 +1,26 @@
 "use strict";
 
+class UserStatusMessage {
+    constructor(username, timestamp, type) {
+        this.DOM = document.createElement("div");
+        this.DOM.classList.add("message");
+        this.DOM.classList.add("statusMessage");
+
+        this.date = new Date(0)
+        this.date.setUTCSeconds(timestamp);
+
+        this.timestamp = document.createElement("span");
+        this.timestamp.classList.add("timestamp");
+        this.timestamp.innerHTML = htmlEncode(`${this.date.getHours()}:${formatZero(this.date.getMinutes().toString(),2)}`);
+
+        this.content = document.createElement("span");
+        this.content.classList.add("content");
+        this.content.innerHTML = htmlEncode(`user ${username} ${type}`);
+
+        this.DOM.append(this.timestamp, this.content);
+    }
+}
+
 class Message {
     constructor(username, content, timestamp) {
         this.DOM = document.createElement("div");

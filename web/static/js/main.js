@@ -1,5 +1,7 @@
 "use strict";
 
+const now = _ => Math.round(Date.now()/1000);
+
 class Shoutbox {
     constructor() {
         this.ui = new Layout();
@@ -48,33 +50,56 @@ class Shoutbox {
         this.connection.send({type:"getHistory"});
     }
 
+    addMessage(data) {
+        let message = new Message(data.from, data.content, data.timestamp);
+        message.content.innerHTML = this.parseEmojis(message.content.innerHTML);
+        message.content.innerHTML = message.content.innerHTML.replace(/\n/g, "</br>");
+        this.ui.messageList.addMessage(message);
+    }
+
+    updateUserNumber() {
+        this.ui.statusBar.setMessage("users: " + this.ui.userList.usersNum());
+    }
+
     setupHandlers() {
         this.connection.setHandler("message", (data) => {
-            let message = new Message(data.from, data.content, data.timestamp);
-            message.content.innerHTML = this.parseEmojis(message.content.innerHTML);
-            this.ui.messageList.addMessage(message);
+            this.addMessage(data);
         });
 
         this.connection.setHandler("userConnected", (data) => {
             this.ui.userList.addUser(data.username);
-            this.ui.statusBar.setMessage("users: " + this.ui.userList.usersNum());
+            this.updateUserNumber();
+
+            let message = new UserStatusMessage(data.username, now(), "has joined");
+            this.ui.messageList.addMessage(message);
         });
 
         this.connection.setHandler("userDisconnected", (data) => {
             this.ui.userList.removeUser(data.username);
-            this.ui.statusBar.setMessage("users: " + this.ui.userList.usersNum());
+            this.updateUserNumber();
+
+            let message = new UserStatusMessage(data.username, now(), "has left");
+            this.ui.messageList.addMessage(message);
         });
 
         this.connection.setHandler("userList", (data) => {
             data.usernames.forEach((u) => this.ui.userList.addUser(u));
-            this.ui.statusBar.setMessage("users: " + this.ui.userList.usersNum());
+            this.updateUserNumber();
         });
 
         this.connection.setHandler("history", (data) => {
             data.content.forEach((m) => {
-                let message = new Message(m.from, m.content, m.timestamp);
-                message.content.innerHTML = this.parseEmojis(message.content.innerHTML);
-                this.ui.messageList.addMessage(message);
+                if(m.type == "msg") {
+                    this.addMessage(m);
+                } else {
+                    let message = undefined;
+                    if(m.type == "join") {
+                        message = new UserStatusMessage(m.content, m.timestamp, "has joined");
+                    } else if(m.type == "exit") {
+                        message = new UserStatusMessage(m.content, m.timestamp, "has left");
+                    }
+                    this.ui.messageList.addMessage(message);
+                }
             });
         });
 

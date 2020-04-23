@@ -89,6 +89,7 @@ body {
     padding-right: 5px;
     background-color: WhiteSmoke;
     flex-grow: 1;
+    resize: none;
 }
 
 .shoutbox .messageControls .sendButton {
@@ -114,9 +115,14 @@ body {
     border-bottom: 1px solid lightgray;
 }
 
+.shoutbox .messageList .statusMessage .content {
+    color: gray;
+    font-style: italic;
+}
+
 .shoutbox .messageList .message .timestamp {
     font-size: 0.75em;
-    text-color: gray;
+    color: gray;
     margin-left: 2px;
     margin-right: 2px;
 }
