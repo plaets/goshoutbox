@@ -83,6 +83,7 @@ class Shoutbox {
                 let img =  new Image();
                 img.src = `${location.protocol + "//" + location.host + location.pathname}emoji/${n}`;
                 img.classList.add("emoji");
+                img.alt = `:${n}:`;
                 this.emojis[n] = img;
             }
         });
@@ -185,6 +186,8 @@ class Shoutbox {
         //(client loses connection, reconnects, asks for history, gets the same old history with maybe few new messages, 
         //appends all the messages from the new history to the old message list)
         //i dont want to just purge the old history since the new history may be empty if the connection was lost due to the server crashing 
+        //comparing the content and date of every message sounds like a bad idea
+        //maybe add "after" field to the getHistory message
     }
 }
 
