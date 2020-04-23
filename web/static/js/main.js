@@ -190,6 +190,7 @@ class Shoutbox {
 
                     this.ui.statusBar.setMessage("connected");
                     this.ui.userList.clear();
+                    this.ui.messageList.clear();
                     this.connection.send({type:"setUsername",username:this.lastUsername});
                     this.reconnecting = false;
                 })
@@ -197,12 +198,8 @@ class Shoutbox {
                 .then(() => this.setupErrorHandlers())
                 .then(() => this.sendInitMessages());
         }, 5000);
-        //TODO: there is a possibility, that after reconnecting all messages will be doubled 
-        //(client loses connection, reconnects, asks for history, gets the same old history with maybe few new messages, 
-        //appends all the messages from the new history to the old message list)
-        //i dont want to just purge the old history since the new history may be empty if the connection was lost due to the server crashing 
-        //comparing the content and date of every message sounds like a bad idea
-        //maybe add "after" field to the getHistory message
+        //TODO: append new messages after reconnecting instead of removing the old ones
+        //TODO: double join message after reconnecting
     }
 }
 

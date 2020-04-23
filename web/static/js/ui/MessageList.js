@@ -62,7 +62,8 @@ class MessageList {
         }
     } 
 
-    clearMessages() {
+    clear() {
+        this.messages = [];
         while(this.DOM.lastChild) this.DOM.removeChild(this.DOM.lastChild);
     }
 }
