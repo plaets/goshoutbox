@@ -1,11 +1,19 @@
 "use strict";
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
     let connection = new ChatConnection((location.protocol == "https:" ? "wss://" : "ws://") + location.host + location.pathname + "ws"); //probably a bad idea
-    connection.setHandler("default", console.log);
 
     let ui = new Layout();
     document.body.append(ui.DOM);
+
+    connection.setErrorHandler((err) => {
+        console.log(err);
+        ui.statusBar.setError("connection error");
+    });
+
+    connection.closePromise.then((() => {
+        ui.statusBar.setError("connection closed");
+    }));
 
     let emojis = {};
 
@@ -21,7 +29,7 @@ document.addEventListener("DOMContentLoaded", () => {
         return message;
     }
 
-    connection.openPromise().then(() => {
+    connection.openPromise.then(() => {
         let usernamePrompt = new Prompt("enter your username", "username");
         ui.DOM.append(usernamePrompt.DOM);
 
@@ -46,7 +54,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
         connection.setHandler("message", (data) => {
-            console.log(data);
             let message = new Message(data.from, data.content, data.timestamp);
             message.content.innerHTML = parseEmojis(message.content.innerHTML);
             ui.messageList.addMessage(message);
@@ -82,7 +89,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 img.classList.add("emoji");
                 emojis[n] = img;
             }
-            console.log(emojis);
         });
 
         let errorHandlers = {
@@ -103,7 +109,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 }, () => {});
             },
             "messageInvalid": () => { 
-                ui.statusBar.setError("message invalid");
+                ui.statusBar.setError("invalid message");
             },
             "usernameNotSet": () => {
                 let usernamePrompt = new Prompt("no username is set, please set a username", 

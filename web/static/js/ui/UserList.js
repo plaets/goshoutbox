@@ -32,7 +32,6 @@ class UserList {
     }
 
     usersNum() {
-        console.log(this.users);
         return this.users.length;
     }
 }

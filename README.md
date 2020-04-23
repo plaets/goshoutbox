@@ -25,6 +25,8 @@ Configuration is stored in the `config.json` file. Example configuration can be 
 
 ## Todo
 
+* User join/exit message
+* Automatic reconnection after websocket errors
 * More configuration options
 * Basic markdown
 * Private messages 
