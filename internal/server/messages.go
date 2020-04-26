@@ -19,6 +19,7 @@ var unknownTypeError, _ = json.Marshal(map[string]string{"type":ErrorType,"messa
 var unknownError, _ = json.Marshal(map[string]string{"type":ErrorType,"message":"unknownError"})
 
 const (
+    BannerType = "banner"
     UserListType = "userList"
     MessageType = "message"
     HistoryType = "history"
@@ -28,6 +29,11 @@ const (
     ErrorType = "error"
     SuccessType = "success"
 )
+
+type Banner struct {
+    Type string `json:"type"`
+    Content string `json:"content"`
+}
 
 type UserList struct {
     Type string `json:"type"`

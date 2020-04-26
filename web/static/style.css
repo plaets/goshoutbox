@@ -8,12 +8,16 @@ body {
     overflow: hidden;
 }
 
+a:visited {
+    color: blue;
+}
+
 .shoutbox {
     height: calc(100% - 15px);
     width: calc(100% - 15px);
     min-width: 350px;
     grid-template-columns: minmax(8rem, auto) 9fr;
-    grid-template-rows: calc(100% - 60px - 5px) 60px;
+    grid-template-rows: 35px calc(100% - 60px - 35px - 10px) 60px;
     display: grid;
     grid-gap: 5px;
     position: relative;
@@ -37,12 +41,35 @@ body {
     height: 100%;
     width: 100%;
     grid-column: 1;
-    grid-row: 1;
+    grid-row: 1 / span 2;
     overflow: auto;
 }
 
 .shoutbox .userList * {
     margin: 2px;
+}
+
+/* topBar */
+.shoutbox .topBar {
+    font-size: 1em;
+    border: 1px solid black; 
+    height: 100%;
+    width: 100%;
+    grid-column: 2;
+    grid-row: 1;
+    overflow: auto;
+    padding: 5px;
+
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-gap: 5px;
+    align-items: center;
+}
+
+.shoutbox .topBar .banner {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 /* statusBar */
@@ -51,7 +78,7 @@ body {
     height: 100%;
     width: 100%;
     grid-column: 1;
-    grid-row: 2;
+    grid-row: 3;
 
     display: flex;
     justify-content: center;
@@ -75,7 +102,7 @@ body {
     height: 100%;
     width: 100%;
     grid-column: 2;
-    grid-row: 2;
+    grid-row: 3;
 
     display: flex;
     justify-content: space-between;
@@ -106,7 +133,7 @@ body {
     height: 100%;
     width: 100%;
     grid-column: 2;
-    grid-row: 1;
+    grid-row: 2;
     overflow: auto;
 }
 
@@ -233,6 +260,10 @@ body {
     
     .shoutbox .statusBarWrapper {
         visibility: hidden;
+    }    
+
+    .shoutbox .topBar {
+        grid-column: 1 / span 2;
     }    
 
     .shoutbox .messageList {

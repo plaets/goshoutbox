@@ -19,7 +19,10 @@ type ChatServer struct {
     messageLog MessageLog
     logMutex sync.Mutex
     mux *http.ServeMux
+
     emojis []string
+    banner string
+
     config map[string]interface{}
 }
 
@@ -31,9 +34,11 @@ func NewChatServer(config map[string]interface{}) *ChatServer {
         emojis = append(emojis, v.(map[string]interface{})["name"].(string))
     }
 
+    banner := config["banner"].(string)
+
     fsServer := http.FileServer(http.Dir("web/static"))
     mux := http.NewServeMux()
-    server := &ChatServer{make([]*ChatUser, 0), sync.Mutex{}, NewMessageLog(50), sync.Mutex{}, mux, emojis, config}
+    server := &ChatServer{make([]*ChatUser, 0), sync.Mutex{}, NewMessageLog(50), sync.Mutex{}, mux, emojis, banner, config}
 
     mux.Handle("/", fsServer)
     mux.HandleFunc("/emoji/", getEmoji(server))
@@ -46,6 +51,8 @@ func NewChatServer(config map[string]interface{}) *ChatServer {
         server.usersMutex.Lock()
         server.users = append(server.users, user)
         server.usersMutex.Unlock()
+
+        server.sendBanner(user)
 
         go server.loop(user)
     })
@@ -82,6 +89,17 @@ func startServers(server *ChatServer) {
     }
 
     waitGroup.Wait()
+}
+
+func (server *ChatServer) sendBanner(user *ChatUser) {
+    msg, err := json.Marshal(Banner{ BannerType, server.banner })
+
+    if err != nil {
+        logger.Println(err)
+        return
+    }
+
+    user.connection.writeChannel <- msg
 }
 
 func (server *ChatServer) loop(user *ChatUser) {

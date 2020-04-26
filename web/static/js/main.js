@@ -1,7 +1,5 @@
 "use strict";
 
-const now = _ => Math.round(Date.now()/1000);
-
 class Shoutbox {
     constructor() {
         this.ui = new Layout();
@@ -62,6 +60,11 @@ class Shoutbox {
     }
 
     setupHandlers() {
+        this.connection.setHandler("banner", (data) => {
+            console.log(data);
+            this.ui.topBar.setBanner(data.content);
+        });
+
         this.connection.setHandler("message", (data) => {
             this.addMessage(data);
         });

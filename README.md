@@ -25,11 +25,13 @@ Configuration is stored in the `config.json` file. Example configuration can be 
 
 ## Todo
 
-* More configuration options
+* Banner
+* Notifications 
+* Flooding prevention
+* Basic administration
 * Basic markdown
 * Private messages 
-* Basic administration
-* Flooding prevention
+* More configuration options
 * Maybe rewrite the UI in something maintainable 
 * Maybe actually *design* the UI
 * Authentication plugins/reserving nicknames
@@ -37,11 +39,11 @@ Configuration is stored in the `config.json` file. Example configuration can be 
 * More sophisticated logging/history
 * Stats
 * Filters (delete messages containing words, links, etc. probably better as a plugin)
-* Admin notifications
 
 ## Dependencies
 
 * https://github.com/gorilla/websocket
+* https://gist.github.com/dperini/729294
 
 ## Screenshots
 

@@ -5,8 +5,10 @@ function formatZero(string, length) {
 }
 
 function htmlEncode(string) {
-    return [[/</g, "&lt"], [/>/g, "&gt"], [/"/g, "&#34"], [/'/g, "&#39"]].reduce((p, v) => p.replace(v[0],v[1]), string); //fully safe!!!!! 
+    return [[/</g, "&lt"], [/>/g, "&gt"], [/"/g, "&#34"], [/'/g, "&#39"]].reduce((p, v) => p.replace(v[0],v[1]), string); //fully safe!!!!! (was that a joke?)
 }
+
+const now = _ => Math.round(Date.now()/1000);
 
 class Deferred {
     constructor(handler) {
