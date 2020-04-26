@@ -50,7 +50,7 @@ class Shoutbox {
 
     addMessage(data) {
         let message = new Message(data.from, data.content, data.timestamp);
-        message.content.innerHTML = this.parseEmojis(message.content.innerHTML);
+        message.content.innerHTML = formatLinks(this.parseEmojis(message.content.innerHTML));
         message.content.innerHTML = message.content.innerHTML.replace(/\n/g, "</br>");
         this.ui.messageList.addMessage(message);
     }
