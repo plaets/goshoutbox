@@ -20,24 +20,22 @@ jobs:
 
     - name: Build and package binaries
       run: |
-        mkdir artifacts
         for arch in arm amd64; do
           mkdir -p build/$arch
           env GOOS=linux GOARCH=$arch go build -o build/$arch/goshoutbox cmd/goshoutbox/goshoutbox.go 
           cp -r web build/$arch/
           cp minimal-config.json build/$arch/config.json
-          cd build/$arch
-          tar cvf ../../artifacts/goshoutbox-$arch.tar.gz .
-          cd ../../
         done
 
-    - name: Archive artifacts
+    - name: Archive arm build
       uses: actions/upload-artifact@v2
       with:
-        name: goshoutbox
-        path: |
-          artifacts/goshoutbox-arm.tar.gz
-          artifacts/goshoutbox-amd64.tar.gz
+        name: goshoutbox-arm
+        path: build/arm
 
-      
+    - name: Archive amd64 build
+      uses: actions/upload-artifact@v2
+      with:
+        name: goshoutbox-amd
+        path: build/amd64
 
