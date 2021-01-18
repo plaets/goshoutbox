@@ -22,6 +22,9 @@ Configuration is stored in the `config.json` file. Example configuration can be 
         * addr - (string) address that the https server should listen on
         * key - (string) path to the ssl key 
         * cert - (string) path to the ssl certificate
+    * emoji - (array) list of emojis
+        + name - (string) name of emoji
+        + path - (string) path to image file
 
 ## Todo
 
