@@ -34,7 +34,10 @@ func NewChatServer(config map[string]interface{}) *ChatServer {
         emojis = append(emojis, v.(map[string]interface{})["name"].(string))
     }
 
-    banner := config["banner"].(string)
+    var banner string = ""
+    if b, ok := config["banner"]; ok {
+        banner = b.(string)
+    }
 
     fsServer := http.FileServer(http.Dir("web/static"))
     mux := http.NewServeMux()
