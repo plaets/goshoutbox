@@ -12,6 +12,7 @@ class UserStatusMessage {
         this.timestamp = document.createElement("span");
         this.timestamp.classList.add("timestamp");
         this.timestamp.innerHTML = htmlEncode(`${this.date.getHours()}:${formatZero(this.date.getMinutes().toString(),2)}`);
+        this.timestamp.title = htmlEncode(this.date.toISOString());
 
         this.content = document.createElement("span");
         this.content.classList.add("content");
@@ -32,6 +33,7 @@ class Message {
         this.timestamp = document.createElement("span");
         this.timestamp.classList.add("timestamp");
         this.timestamp.innerHTML = htmlEncode(`${this.date.getHours()}:${formatZero(this.date.getMinutes().toString(),2)}`);
+        this.timestamp.title = htmlEncode(this.date.toISOString());
 
         this.username = document.createElement("span");
         this.username.classList.add("username");
